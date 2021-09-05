@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\api;
 
+
 use App\Http\Controllers\Controller;
 use App\Laravue\JsonResponse;
-use App\Laravue\Models\Client;
-use App\Laravue\Models\Pet;
+use App\Laravue\Models\Specie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class ClientController extends Controller
+class SpecieController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,15 +22,12 @@ class ClientController extends Controller
         $searchParams = $request->all();
         $name = Arr::get($searchParams, 'name', '');
 
-        $animals = Client::all()->toArray();
+        $specie = Specie::all()->toArray();
 
         if (!empty($name)) {
-            $animals = Client::where('first_name', 'LIKE', '%' . $name . '%')
-                ->OrWhere('last_name', 'LIKE', '%' . $name . '%')
-                ->get()
-                ->toArray();
+            $specie = Specie::where('name', 'LIKE', '%' . $name . '%')->get()->toArray();
         }
-        return response()->json(new JsonResponse(['items' => $animals, 'total' => count($animals)]));
+        return response()->json(new JsonResponse(['items' => $specie, 'total' => count($specie)]));
     }
 
     /**
@@ -52,18 +49,13 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         //
-        $client = new Client([
-            'document_type' => $request->document_type,
-            'document_number' => $request->document_number,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'direction' => $request->direction,
-            'email' => $request->email,
-            'phone' => $request->phone,
+
+        $specie = new Specie([
+            'name' => $request->name,
         ]);
 
-        $client->save();
-        $data = ['id' => $client->toArray()['id']];
+        $specie->save();
+        $data = ['id' => $specie->toArray()['id']];
 
         return response()->json(new JsonResponse(['items' => $data, 'total' => 15]));
     }
@@ -100,16 +92,9 @@ class ClientController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $animal = Client::where('id', $id)
+        $specie = Specie::where('id', $id)
             ->update([
-                'document_type' => $request->document_type,
-                'document_number' => $request->document_number,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'direction' => $request->direction,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'status' => $request->status,
+                'name' => $request->name,
             ]);
     }
 
@@ -122,18 +107,5 @@ class ClientController extends Controller
     public function destroy($id)
     {
         //
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function mascota(Request $request)
-    {
-        //
-        $searchParams = $request->all();
-        $cliente_id = Arr::get($searchParams, 'id', '');
-        $pets = Pet::where('client_id', '=', $cliente_id)->get()->toArray();
-        return response()->json(new JsonResponse(['items' => $pets]));
     }
 }

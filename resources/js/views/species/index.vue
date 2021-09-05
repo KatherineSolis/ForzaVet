@@ -3,7 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Cliente</span>
+          <span>Animales</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -28,7 +28,7 @@
               class="filter-item"
               style="margin-left: 10px"
               type="primary"
-              icon="el-icon-plus"
+              icon="el-icon-edit"
               @click="handleCreate"
             >
               {{ $t('table.add') }}
@@ -56,86 +56,34 @@
             </template>
           </el-table-column>
           <el-table-column
-            label="Tipo de documento"
-            prop="document_type"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.document_type }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Numero de documento"
-            prop="document_number"
-            align="center"
-            width="180px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.document_number }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
             label="Nombre"
             prop="name"
             align="center"
             width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Direccion"
-            prop="direction"
-            align="center"
-            min-width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.direction }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Correo"
-            prop="email"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.email }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Telefono"
-            prop="phone"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.phone }}</span>
-            </template>
-          </el-table-column>
+          />
           <el-table-column label="Estado" class-name="status-col" width="100">
             <template slot-scope="{row}">
               <div v-if="row.status == 1">
-                <el-tag type="success" class="tag-item el-tag el-tag--medium el-tag--light">
-                  <i class="el-icon-open" /> Activo
+                <el-tag type="success">
+                  Activo
                 </el-tag>
               </div>
               <div v-else>
                 <el-tag type="danger">
-                  <i class="el-icon-turn-off" /> Inactivo
+                  Inactivo
                 </el-tag>
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
+          <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-              <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
+              <el-button type="primary" size="mini" @click="handleUpdate(row)">
+                Editar
+              </el-button>
+              <el-button v-if="row.status==1" size="mini" type="danger" @click="handleModifyStatus(row, 0)">
                 Inactivar
               </el-button>
-              <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success" @click="handleModifyStatus(row, 1)">
+              <el-button v-if="row.status==0" size="mini" type="success" @click="handleModifyStatus(row, 1)">
                 Activar
               </el-button>
             </template>
@@ -145,34 +93,9 @@
         <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-          <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
-            <el-form-item label="Tipo de documento" prop="document_type">
-              <el-select v-model="temp.document_type" placeholder="Seleccionar">
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Numero Doc" prop="document_number">
-              <el-input v-model="temp.document_number" />
-            </el-form-item>
-            <el-form-item label="Nombres" prop="first_name">
-              <el-input v-model="temp.first_name" />
-            </el-form-item>
-            <el-form-item label="Apellidos" prop="last_name">
-              <el-input v-model="temp.last_name" />
-            </el-form-item>
-            <el-form-item label="Direccion" prop="direction">
-              <el-input v-model="temp.direction" />
-            </el-form-item>
-            <el-form-item label="Correo" prop="email">
-              <el-input v-model="temp.email" />
-            </el-form-item>
-            <el-form-item label="Telefono" prop="phone">
-              <el-input v-model="temp.phone" />
+          <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 500px; margin-left:50px;">
+            <el-form-item label="Nombre" prop="name">
+              <el-input v-model="temp.name" />
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -190,7 +113,7 @@
   </div>
 </template>
 <script>
-import { fetchList, createPersonal, updatePersonal } from '@/api/personal';
+import { fetchList, createSpecie, updateSpecie } from '@/api/specie';
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 
 export default {
@@ -217,22 +140,11 @@ export default {
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
-        observation: [{ required: true, message: 'type is required', trigger: 'change' }],
       },
       temp: {
         id: undefined,
         name: '',
-        observation: '',
       },
-      options: [
-        {
-          value: 'CI',
-          label: 'Cedula',
-        },
-        {
-          value: 'Passport',
-          label: 'Pasaporte',
-        }],
     };
   },
   created() {
@@ -264,7 +176,6 @@ export default {
       this.temp = {
         id: undefined,
         name: '',
-        observation: '',
       };
     },
     handleCreate() {
@@ -280,7 +191,7 @@ export default {
         if (valid) {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
-          createPersonal(this.temp).then((response) => {
+          createSpecie(this.temp).then((response) => {
             this.list.push(this.temp);
             this.dialogFormVisible = false;
 
@@ -298,7 +209,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp);
-          updatePersonal(this.temp).then(() => {
+          updateSpecie(this.temp).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v);
@@ -320,7 +231,7 @@ export default {
     async handleModifyStatus(row, status) {
       this.listLoading = true;
       row.status = status;
-      await updatePersonal(row);
+      await updateSpecie(row);
 
       this.$message({
         message: 'Successful operation',

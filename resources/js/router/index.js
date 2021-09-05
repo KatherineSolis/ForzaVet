@@ -13,10 +13,10 @@ Vue.use(Router);
 import Layout from '@/layout';
 
 /* Router for modules */
-import tableRoutes from './modules/table';
+// import tableRoutes from './modules/table';
 import adminRoutes from './modules/admin';
-import permissionRoutes from './modules/permission';
-import elementUI from './modules/element-ui';
+// import permissionRoutes from './modules/permission';
+// import elementUI from './modules/element-ui';
 
 /**
  * Sub-menu only appear when children.length>=1
@@ -42,124 +42,206 @@ import elementUI from './modules/element-ui';
 **/
 
 export const constantRoutes = [{
-        path: '/redirect',
-        component: Layout,
-        hidden: true,
-        children: [{
-            path: '/redirect/:path*',
-            component: () =>
+  path: '/redirect',
+  component: Layout,
+  hidden: true,
+  children: [{
+    path: '/redirect/:path*',
+    component: () =>
                 import ('@/views/redirect/index'),
-        }, ],
-    },
-    {
-        path: '/login',
-        component: () =>
+  }],
+},
+{
+  path: '/login',
+  component: () =>
             import ('@/views/login/index'),
-        hidden: true,
-    },
-    {
-        path: '/auth-redirect',
-        component: () =>
+  hidden: true,
+},
+{
+  path: '/auth-redirect',
+  component: () =>
             import ('@/views/login/AuthRedirect'),
-        hidden: true,
-    },
-    /*{
-        path: '/404',
-        redirect: { name: 'Page404' },
-        component: () =>
-            import ('@/views/error-page/404'),
-        hidden: true,
-    },
-    {
-        path: '/401',
-        component: () =>
-            import ('@/views/error-page/401'),
-        hidden: true,
-    },*/
-    {
-        path: '',
-        component: Layout,
-        redirect: 'dashboard',
-        children: [{
-            path: 'dashboard',
-            component: () =>
+  hidden: true,
+},
+/* {
+                        path: '/404',
+                        redirect: { name: 'Page404' },
+                        component: () =>
+                            import ('@/views/error-page/404'),
+                        hidden: true,
+                    },
+                    {
+                        path: '/401',
+                        component: () =>
+                            import ('@/views/error-page/401'),
+                        hidden: true,
+                    },*/
+{
+  path: '',
+  component: Layout,
+  redirect: 'dashboard',
+  children: [{
+    path: 'dashboard',
+    component: () =>
                 import ('@/views/dashboard/index'),
-            name: 'Dashboard',
-            meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
-        }, ],
-    },
-    //elementUI,
+    name: 'Dashboard',
+    meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
+  }],
+},
 ];
 
-export const asyncRoutes = [
-    permissionRoutes,
-    //tableRoutes,
-    {
-        path: '/agenda',
-        component: Layout,
-        redirect: '/agenda/index',
-        name: 'agenda',
-        meta: {
-            title: 'Agenda',
-            icon: 'clipboard', // Using SVG icon
-        },
-        children: [{
-                path: 'index', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'FullCalendar',
-                component: () =>
+export const asyncRoutes = [{
+  path: '',
+  component: Layout,
+  redirect: 'client',
+  children: [{
+    path: 'client',
+    component: () =>
+                import ('@/views/client/Index'),
+    name: 'Client',
+    meta: { title: 'Clientes', icon: 'peoples', noCache: false },
+  }],
+},
+{
+  path: '/mascotas',
+  component: Layout,
+  children: [{
+    path: 'list',
+    component: () =>
+                    import ('@/views/pets/index'),
+    name: 'pets',
+    meta: { title: 'Mascotas', icon: 'qq', noCache: false },
+  },
+    /* {
+                                                path: 'edit/:id(\\d+)',
+                                                component: () =>
+                                                    import ('@/views/pets/Edit'),
+                                                name: 'EditPet',
+                                                meta: { title: 'Edit Pet', noCache: true },
+                                                hidden: true,
+                                            },*/
+  ],
+},
+{
+  path: '/historial',
+  component: Layout,
+  children: [{
+    path: 'historial',
+    component: () =>
+                import ('@/views/visit/index'),
+    name: 'historial',
+    meta: { title: 'Historial', icon: 'form', noCache: false },
+  }],
+},
+{
+  path: '/agenda',
+  component: Layout,
+  redirect: '/agenda/index',
+  name: 'Agenda',
+  meta: {
+    title: 'Agenda',
+    icon: 'el-icon-date', // Using SVG icon
+  },
+  children: [{
+    path: 'citas', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'FullCalendar',
+    component: () =>
                     import ('@/views/calendario/index'),
-                meta: { title: 'Calendario', icon: 'el-icon-date' }, // foo submenu
-            },
-            {
-                path: 'listarcita', // When clicking this submenu, it will redirect to /#/foo/bar
-                name: 'listarcita',
-                meta: { title: 'Listar Citas', icon: 'list' }, // bar submenu
-            },
-        ],
-    },
-    {
-        path: '/usuario',
-        component: Layout,
-        redirect: '/usuario/index',
-        name: 'usuario',
-        meta: {
-            title: 'Usuarios',
-            icon: 'user', // Using SVG icon
-        },
-        children: [{
-                path: 'index', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'cliente',
-                meta: { title: 'Clientes', icon: 'role' }, // foo submenu
-            },
-            {
-                path: 'paciente', // When clicking this submenu, it will redirect to /#/foo/bar
-                name: 'paciente',
-                meta: { title: 'Pacientes', icon: 'role' }, // bar submenu
-            },
-        ],
-    },
-    adminRoutes,
-    {
-        path: '/404',
-        component: () =>
+    meta: { title: 'Citas', icon: 'edit' }, // foo submenu
+  },
+  {
+    path: 'listarcita', // When clicking this submenu, it will redirect to /#/foo/bar
+    name: 'listarcita',
+    meta: { title: 'Listar Citas', icon: 'list' }, // bar submenu
+  },
+  ],
+},
+{
+  path: '/servicio',
+  component: Layout,
+  redirect: '/servicio/index',
+  name: 'servicio',
+  meta: {
+    title: 'Servicio',
+    icon: 'component', // Using SVG icon
+  },
+  children: [{
+    path: 'visit', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'visitList',
+    component: () =>
+                    import ('@/views/visit/index'),
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+  },
+  {
+    path: 'peluqueria', // When clicking this submenu, it will redirect to /#/foo/bar
+    name: 'peluqueriaList',
+    component: () =>
+                    import ('@/views/peluqueria/index'),
+    meta: { title: 'Peluquería', icon: 'list' }, // bar submenu
+  },
+  {
+    path: 'crear',
+    component: () =>
+                    import ('@/views/peluqueria/create'),
+    name: 'peluqueria',
+    hidden: true,
+  },
+  ],
+},
+adminRoutes,
+{
+  path: '/inventario',
+  component: Layout,
+  redirect: '/inventario/index',
+  name: 'inventario',
+  meta: {
+    title: 'Inventario',
+    icon: 'user', // Using SVG icon
+  },
+  children: [{
+    path: 'proveedores', // When clicking this submenu, it will redirect to /#/foo/index
+    component: () =>
+                    import ('@/views/supplier/index'),
+    name: 'proveedoresList',
+    meta: { title: 'Proveedores', icon: 'role' }, // foo submenu
+  },
+  {
+    path: 'category', // When clicking this submenu, it will redirect to /#/foo/bar
+    component: () =>
+                    import ('@/views/category/index'),
+    name: 'category',
+    meta: { title: 'Categoria', icon: 'role' }, // bar submenu
+  },
+  {
+    path: 'productos', // When clicking this submenu, it will redirect to /#/foo/bar
+    component: () =>
+                    import ('@/views/pets/index'),
+    name: 'producto',
+    meta: { title: 'Producto', icon: 'role' }, // bar submenu
+  },
+  ],
+},
+{
+  path: '/404',
+  component: () =>
             import ('@/views/error-page/404'),
-        hidden: true,
-    },
+  hidden: true,
+},
 ];
 
 const createRouter = () => new Router({
-    // mode: 'history', // require service support
-    scrollBehavior: () => ({ y: 0 }),
-    base: process.env.MIX_LARAVUE_PATH,
-    routes: constantRoutes,
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  base: process.env.MIX_LARAVUE_PATH,
+  routes: constantRoutes,
 });
 
 const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-    const newRouter = createRouter();
-    router.matcher = newRouter.matcher; // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
 
 export default router;

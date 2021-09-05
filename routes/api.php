@@ -18,7 +18,7 @@ use \App\Laravue\Acl;
 |
 */
 
-Route::namespace('Api')->group(function() {
+Route::namespace('Api')->group(function () {
     Route::post('auth/login', 'AuthController@login');
     Route::group(['middleware' => 'auth:sanctum'], function () {
         // Auth routes
@@ -37,7 +37,7 @@ Route::namespace('Api')->group(function() {
         // Custom routes
         Route::put('users/{user}', 'UserController@update');
         Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
-        Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' .Acl::PERMISSION_PERMISSION_MANAGE);
+        Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
         Route::get('roles/{role}/permissions', 'RoleController@permissions')->middleware('permission:' . Acl::PERMISSION_PERMISSION_MANAGE);
 
         //Animals
@@ -45,10 +45,52 @@ Route::namespace('Api')->group(function() {
         Route::post('/animal/create', 'AnimalController@store');
         Route::post('/animal/update/{id}', 'AnimalController@update');
 
+        //Pets
+        Route::get('/pets', 'PetController@index');
+        Route::post('/pet/create', 'PetController@store');
+        Route::post('/pet/update/{id}', 'PetController@update');
+        Route::get('/pet/client', 'PetController@client');
+
         //Client
         Route::get('/clients', 'ClientController@index');
         Route::post('/client/create', 'ClientController@store');
         Route::post('/client/update/{id}', 'ClientController@update');
+        Route::get('/client/pet', 'ClientController@mascota');
+
+        //Supplier
+        Route::get('/suppliers', 'SupplierController@index');
+        Route::post('/supplier/create', 'SupplierController@store');
+        Route::post('/supplier/update/{id}', 'SupplierController@update');
+
+        //Species
+        Route::get('/species', 'SpecieController@index');
+        Route::post('/specie/create', 'SpecieController@store');
+        Route::post('/specie/update/{id}', 'SpecieController@update');
+
+        //Category
+        Route::get('/category', 'CategoryController@index');
+        Route::post('/category/create', 'CategoryController@store');
+        Route::post('/category/update/{id}', 'CategoryController@update');
+
+        //Medicos
+        Route::get('/personal', 'PersonalController@index');
+        Route::post('/personal/create', 'PersonalController@store');
+        Route::post('/personal/update/{id}', 'PersonalController@update');
+
+        //Cita
+        Route::get('/citas', 'AppointmentController@index');
+        Route::post('/cita/create', 'AppointmentController@store');
+        Route::post('/cita/update/{id}', 'AppointmentController@update');
+        Route::get('/cita/personals', 'AppointmentController@personal');
+        Route::get('/cita/client', 'AppointmentController@client');
+        Route::get('/cita/pet', 'AppointmentController@mascota');
+        Route::get('/cita/vaccine', 'AppointmentController@vaccines');
+        Route::get('/cita/antiparasitic', 'AppointmentController@antiparasitic');
+
+        //Clinic_history
+        Route::get('/histories', 'Clinic_historyController@index');
+        Route::post('/history/create', 'Clinic_historyController@store');
+        Route::post('/history/update/{id}', 'Clinic_historyController@update');
     });
 });
 

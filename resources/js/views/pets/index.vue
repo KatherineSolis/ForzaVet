@@ -3,7 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Cliente</span>
+          <span>Mascotas</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -45,36 +45,7 @@
           style="width: 100%"
           @sort-change="sortChange"
         >
-          <el-table-column
-            :label="$t('table.id')"
-            prop="id"
-            align="center"
-            width="80"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.id }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Tipo de documento"
-            prop="document_type"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.document_type }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Numero de documento"
-            prop="document_number"
-            align="center"
-            width="180px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.document_number }}</span>
-            </template>
-          </el-table-column>
+
           <el-table-column
             label="Nombre"
             prop="name"
@@ -82,39 +53,87 @@
             width="150px"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
+              <span>{{ scope.row.nombre_mascota }}</span>
             </template>
           </el-table-column>
+
           <el-table-column
-            label="Direccion"
-            prop="direction"
+            label="Edad"
+            prop="age"
+            align="center"
+            width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.age }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Sexo"
+            prop="sex"
+            align="center"
+            width="180px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.sex }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Peso"
+            prop="weight"
+            align="center"
+            width="180px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.weight }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Color"
+            prop="color"
+            align="center"
+            width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.color }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Especie"
+            prop="specie"
+            align="center"
+            width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.specie }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Raza"
+            prop="breed"
+            align="center"
+            width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.breed }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column
+            label="Propietario"
+            prop="client_id"
             align="center"
             min-width="150px"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.direction }}</span>
+              <span>{{ scope.row.nombre_cliente }}</span>
             </template>
           </el-table-column>
-          <el-table-column
-            label="Correo"
-            prop="email"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.email }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Telefono"
-            prop="phone"
-            align="center"
-            width="150px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.phone }}</span>
-            </template>
-          </el-table-column>
+
           <el-table-column label="Estado" class-name="status-col" width="100">
             <template slot-scope="{row}">
               <div v-if="row.status == 1">
@@ -131,13 +150,15 @@
           </el-table-column>
           <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
+
               <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
                 Inactivar
               </el-button>
               <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success" @click="handleModifyStatus(row, 1)">
                 Activar
               </el-button>
+              <el-button type="primary" icon="el-icon-edit" size="small" @click="handleUpdate(row)" />
+              <el-button type="success" icon="el-icon-view" size="small" @click="handleView(row)" />
             </template>
           </el-table-column>
         </el-table>
@@ -146,8 +167,8 @@
 
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
           <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
-            <el-form-item label="Tipo de documento" prop="document_type">
-              <el-select v-model="temp.document_type" placeholder="Seleccionar">
+            <el-form-item label="Sexo" prop="sex">
+              <el-select v-model="temp.sex" placeholder="Seleccionar sexo...">
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -156,23 +177,43 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Numero Doc" prop="document_number">
-              <el-input v-model="temp.document_number" />
+            <el-form-item label="Tipo Mascota" prop="specie">
+              <el-select v-model="temp.specie" placeholder="Seleccionar">
+                <el-option
+                  v-for="item in species"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
             </el-form-item>
-            <el-form-item label="Nombres" prop="first_name">
-              <el-input v-model="temp.first_name" />
+            <el-form-item label="Nombre mascota" prop="nombre_mascota">
+              <el-input v-model="temp.nombre_mascota" />
             </el-form-item>
-            <el-form-item label="Apellidos" prop="last_name">
-              <el-input v-model="temp.last_name" />
+            <el-form-item label="Edad" prop="age">
+              <el-input v-model="temp.age" />
             </el-form-item>
-            <el-form-item label="Direccion" prop="direction">
-              <el-input v-model="temp.direction" />
+            <el-form-item label="Peso" prop="weight">
+              <el-input v-model="temp.weight" />
             </el-form-item>
-            <el-form-item label="Correo" prop="email">
-              <el-input v-model="temp.email" />
+            <el-form-item label="Color" prop="color">
+              <el-input v-model="temp.color" />
             </el-form-item>
-            <el-form-item label="Telefono" prop="phone">
-              <el-input v-model="temp.phone" />
+            <el-form-item label="Nombre Cliente" prop="client_id">
+              <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." @input="getListClient">
+                <el-option
+                  v-for="item in optionsClient"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Chip" prop="chip">
+              <el-input v-model="temp.chip" />
+            </el-form-item>
+            <el-form-item label="Raza" prop="breed">
+              <el-input v-model="temp.breed" />
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
@@ -185,19 +226,80 @@
           </div>
         </el-dialog>
 
+        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisiblePet">
+          <el-form ref="data" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+            <el-form-item label="Sexo" prop="sex">
+              <el-select v-model="temp.sex" placeholder="Seleccionar..." disabled>
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Tipo Mascota" prop="specie">
+              <el-select v-model="temp.specie" placeholder="Seleccionar..." disabled>
+                <el-option
+                  v-for="item in species"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Nombre Mascota" prop="nombre_mascota">
+              <el-input v-model="temp.nombre_mascota" disabled />
+            </el-form-item>
+            <el-form-item label="Edad" prop="age">
+              <el-input v-model="temp.age" disabled />
+            </el-form-item>
+            <el-form-item label="Peso" prop="weight">
+              <el-input v-model="temp.weight" disabled />
+            </el-form-item>
+            <el-form-item label="Color" prop="color">
+              <el-input v-model="temp.color" disabled />
+            </el-form-item>
+            <el-form-item label="Nombre cliente" prop="client_id">
+              <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                <el-option
+                  v-for="item in optionsClient"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Chip" prop="chip">
+              <el-input v-model="temp.chip" disabled />
+            </el-form-item>
+            <el-form-item label="Raza" prop="breed">
+              <el-input v-model="temp.breed" disabled />
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisiblePet = false">
+              {{ $t('table.cancel') }}
+            </el-button>
+          </div>
+        </el-dialog>
+
       </el-card>
     </el-row>
   </div>
 </template>
 <script>
-import { fetchList, createPersonal, updatePersonal } from '@/api/personal';
+import { fetchList, createPet, updatePet, ListClient } from '@/api/pet';
+import waves from '@/directive/waves'; // Waves directive
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 
 export default {
   components: { Pagination },
+  directives: { waves },
   data() {
     return {
       tableKey: 0,
+      total: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -208,35 +310,56 @@ export default {
       },
       listLoading: false,
       list: null,
+      optionsClient: [],
       showReviewer: false,
       dialogFormVisible: false,
+      dialogFormVisiblePet: false,
       dialogStatus: '',
       textMap: {
         update: 'Edit',
         create: 'Crear',
+        visualizar: 'Detalle de datos',
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
-        observation: [{ required: true, message: 'type is required', trigger: 'change' }],
       },
       temp: {
         id: undefined,
         name: '',
-        observation: '',
+        age: '',
       },
       options: [
         {
-          value: 'CI',
-          label: 'Cedula',
+          value: 'Hembra',
+          label: 'Hembra',
         },
         {
-          value: 'Passport',
-          label: 'Pasaporte',
+          value: 'Macho',
+          label: 'Macho',
+        }],
+
+      species: [
+        {
+          value: 'Canino',
+          label: 'Canino',
+        },
+        {
+          value: 'Felino',
+          label: 'Felino',
+        },
+        {
+          value: 'Roedores',
+          label: 'Roedores',
+        },
+        {
+          value: 'Aves',
+          label: 'Aves',
         }],
     };
   },
   created() {
     this.getList();
+    this.getListClient();
   },
   methods: {
     handleFilter() {
@@ -254,6 +377,17 @@ export default {
       this.listLoading = false;
       console.log('dataaa', data.items);
     },
+    async getListClient() {
+      this.listLoading = true;
+      const { data } = await ListClient();
+
+      for (var i in data.items) {
+        this.optionsClient.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
+      }
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      console.log('cliente', this.optionsClient);
+    },
     sortChange(data) {
       const { prop, order } = data;
       if (prop === 'id') {
@@ -264,7 +398,7 @@ export default {
       this.temp = {
         id: undefined,
         name: '',
-        observation: '',
+        age: '',
       };
     },
     handleCreate() {
@@ -280,7 +414,7 @@ export default {
         if (valid) {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
-          createPersonal(this.temp).then((response) => {
+          createPet(this.temp).then((response) => {
             this.list.push(this.temp);
             this.dialogFormVisible = false;
 
@@ -298,7 +432,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp);
-          updatePersonal(this.temp).then(() => {
+          updatePet(this.temp).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v);
@@ -320,7 +454,7 @@ export default {
     async handleModifyStatus(row, status) {
       this.listLoading = true;
       row.status = status;
-      await updatePersonal(row);
+      await updatePet(row);
 
       this.$message({
         message: 'Successful operation',
@@ -334,9 +468,14 @@ export default {
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = 'update';
       this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate();
-      });
+    },
+
+    handleView(row) {
+      this.temp = Object.assign({}, row); // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp);
+      console.log(this.temp);
+      this.dialogStatus = 'visualizar';
+      this.dialogFormVisiblePet = true;
     },
 
   },

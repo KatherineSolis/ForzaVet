@@ -5,11 +5,10 @@ namespace App\Laravue\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Breed extends Model
+class Antiparasitic extends Model
 {
     //
     protected $fillable = [
-        'name',
+        'name_antiparasitic',
     ];
-    
 }

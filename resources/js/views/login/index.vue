@@ -29,13 +29,10 @@
       </el-form-item>
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
-          Sign in
+          LOGIN
         </el-button>
       </el-form-item>
-      <div class="tips">
-        <span style="margin-right:20px;">Email: admin@laravue.dev</span>
-        <span>Password: laravue</span>
-      </div>
+
     </el-form>
   </div>
 </template>
@@ -51,14 +48,14 @@ export default {
   data() {
     const validateEmail = (rule, value, callback) => {
       if (!validEmail(value)) {
-        callback(new Error('Please enter the correct email'));
+        callback(new Error('Por favor, ingrese un email válido'));
       } else {
         callback();
       }
     };
     const validatePass = (rule, value, callback) => {
       if (value.length < 4) {
-        callback(new Error('Password cannot be less than 4 digits'));
+        callback(new Error('Ingrese un valor válido'));
       } else {
         callback();
       }
@@ -146,7 +143,7 @@ $light_gray:#eee;
       -webkit-appearance: none;
       border-radius: 0px;
       padding: 12px 5px 12px 15px;
-      color: $light_gray;
+      color: #424242;
       height: 47px;
       &:-webkit-autofill {
         -webkit-box-shadow: 0 0 0px 1000px $bg inset !important;
@@ -170,10 +167,13 @@ $dark_gray:#889aa4;
 $light_gray:#eee;
 .login-container {
   position: fixed;
+
+  background-image: url(https://s1.1zoom.me/big0/712/Dogs_Cats_White_background_Two_Bulldog_Kittens_560471_1280x800.jpg);
   height: 100%;
   width: 100%;
-  background-color: $bg;
   .login-form {
+    border-top:2px solid #46a6ff;
+    border-radius: 8px;
     position: absolute;
     left: 0;
     right: 0;
@@ -181,6 +181,7 @@ $light_gray:#eee;
     max-width: 100%;
     padding: 35px 35px 15px 35px;
     margin: 120px auto;
+    background: #fff;
   }
   .tips {
     font-size: 14px;
@@ -201,7 +202,7 @@ $light_gray:#eee;
   }
   .title {
     font-size: 26px;
-    color: $light_gray;
+    color: #424242;
     margin: 0px auto 40px auto;
     text-align: center;
     font-weight: bold;
@@ -211,7 +212,7 @@ $light_gray:#eee;
     right: 10px;
     top: 7px;
     font-size: 16px;
-    color: $dark_gray;
+    color: #424244;
     cursor: pointer;
     user-select: none;
   }

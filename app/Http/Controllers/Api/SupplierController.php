@@ -4,12 +4,11 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Laravue\JsonResponse;
-use App\Laravue\Models\Client;
-use App\Laravue\Models\Pet;
+use App\Laravue\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class ClientController extends Controller
+class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,15 +21,15 @@ class ClientController extends Controller
         $searchParams = $request->all();
         $name = Arr::get($searchParams, 'name', '');
 
-        $animals = Client::all()->toArray();
+        $suppliers = Supplier::all()->toArray();
 
         if (!empty($name)) {
-            $animals = Client::where('first_name', 'LIKE', '%' . $name . '%')
+            $suppliers = Supplier::where('first_name', 'LIKE', '%' . $name . '%')
                 ->OrWhere('last_name', 'LIKE', '%' . $name . '%')
                 ->get()
                 ->toArray();
         }
-        return response()->json(new JsonResponse(['items' => $animals, 'total' => count($animals)]));
+        return response()->json(new JsonResponse(['items' => $suppliers, 'total' => count($suppliers)]));
     }
 
     /**
@@ -52,7 +51,7 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         //
-        $client = new Client([
+        $supplier = new Supplier([
             'document_type' => $request->document_type,
             'document_number' => $request->document_number,
             'first_name' => $request->first_name,
@@ -62,8 +61,8 @@ class ClientController extends Controller
             'phone' => $request->phone,
         ]);
 
-        $client->save();
-        $data = ['id' => $client->toArray()['id']];
+        $supplier->save();
+        $data = ['id' => $supplier->toArray()['id']];
 
         return response()->json(new JsonResponse(['items' => $data, 'total' => 15]));
     }
@@ -100,7 +99,7 @@ class ClientController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $animal = Client::where('id', $id)
+        $supplier = Supplier::where('id', $id)
             ->update([
                 'document_type' => $request->document_type,
                 'document_number' => $request->document_number,
@@ -122,18 +121,5 @@ class ClientController extends Controller
     public function destroy($id)
     {
         //
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function mascota(Request $request)
-    {
-        //
-        $searchParams = $request->all();
-        $cliente_id = Arr::get($searchParams, 'id', '');
-        $pets = Pet::where('client_id', '=', $cliente_id)->get()->toArray();
-        return response()->json(new JsonResponse(['items' => $pets]));
     }
 }

@@ -20,8 +20,8 @@ class CreateAppointmentTable extends Migration
             $table->string('description');
             $table->unsignedBigInteger('personal_id');
             $table->foreign('personal_id')->references('id')->on('personal')->onUpdate('cascade')->onDelete('cascade');
-            $table->unsignedBigInteger('specie_id');
-            $table->foreign('specie_id')->references('id')->on('species')->onUpdate('cascade')->onDelete('cascade');
+            $table->unsignedBigInteger('pet_id');
+            $table->foreign('pet_id')->references('id')->on('pets')->onUpdate('cascade')->onDelete('cascade');
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('clients')->onUpdate('cascade')->onDelete('cascade');
             $table->string('status')->default(1);

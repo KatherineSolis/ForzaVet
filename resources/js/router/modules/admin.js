@@ -15,16 +15,16 @@ const adminRoutes = {
   children: [
     /** User managements */
     {
-      path: 'medicos',
+      path: 'personal',
       component: () =>
                 import ('@/views/medicos/index'),
-      name: 'Medicos',
+      name: 'MedicosList',
       meta: { title: 'Medicos', icon: 'peoples' },
     },
     {
       path: 'mascotas',
-      /* component: () =>
-                import ('@/views/role-permission/List'),*/
+      component: () =>
+                import ('@/views/species/index'),
       name: 'Mascotas',
       meta: { title: 'tipo Mascotas', icon: 'role' },
     },
@@ -55,39 +55,39 @@ const adminRoutes = {
       path: 'animals',
       component: () =>
                 import ('@/views/animal/Index'),
-      name: 'RoleList',
-      meta: { title: 'Animales', icon: 'role', permissions: ['manage permission'] },
-    },
-    {
-      path: 'clients',
-      component: () =>
-                import ('@/views/client/Index'),
-      name: 'RoleList',
-      meta: { title: 'Clientes', icon: 'role', permissions: ['manage permission'] },
+      name: 'AnimalList',
+      meta: { title: 'Animales', icon: 'role' },
     },
     /* {
-            path: 'articles/create',
+            path: 'clients',
             component: () =>
-                import ('@/views/articles/Create'),
-            name: 'CreateArticle',
-            meta: { title: 'createArticle', icon: 'edit', permissions: ['manage article'] },
-            hidden: true,
-        },
-        {
-            path: 'articles/edit/:id(\\d+)',
-            component: () =>
-                import ('@/views/articles/Edit'),
-            name: 'EditArticle',
-            meta: { title: 'editArticle', noCache: true, permissions: ['manage article'] },
-            hidden: true,
-        },
-        {
-            path: 'articles',
-            component: () =>
-                import ('@/views/articles/List'),
-            name: 'ArticleList',
-            meta: { title: 'articleList', icon: 'list', permissions: ['manage article'] },
+                import ('@/views/client/Index'),
+            name: 'ClientList',
+            meta: { title: 'Clientes', icon: 'role' },
         },*/
+    /* {
+                path: 'articles/create',
+                component: () =>
+                    import ('@/views/articles/Create'),
+                name: 'CreateArticle',
+                meta: { title: 'createArticle', icon: 'edit', permissions: ['manage article'] },
+                hidden: true,
+            },
+            {
+                path: 'articles/edit/:id(\\d+)',
+                component: () =>
+                    import ('@/views/articles/Edit'),
+                name: 'EditArticle',
+                meta: { title: 'editArticle', noCache: true, permissions: ['manage article'] },
+                hidden: true,
+            },
+            {
+                path: 'articles',
+                component: () =>
+                    import ('@/views/articles/List'),
+                name: 'ArticleList',
+                meta: { title: 'articleList', icon: 'list', permissions: ['manage article'] },
+            },*/
   ],
 };
 

@@ -2,32 +2,31 @@ import request from '@/utils/request';
 
 export function fetchList(query) {
   return request({
-    url: '/clients',
+    url: '/pets',
     method: 'get',
     params: query,
   });
 }
 
-export function createClient(data) {
+export function createPet(data) {
   return request({
-    url: '/client/create',
+    url: '/pet/create',
     method: 'post',
     data,
   });
 }
 
-export function updateClient(data) {
+export function updatePet(data) {
   return request({
-    url: '/client/update/' + data.id,
+    url: '/pet/update/' + data.id,
     method: 'post',
     data,
   });
 }
 
-export function listPet(query) {
+export function ListClient() {
   return request({
-    url: '/client/pet',
+    url: '/pet/client',
     method: 'get',
-    params: query,
   });
 }

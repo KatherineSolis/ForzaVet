@@ -1,6 +1,7 @@
 <?php
 
 use App\Laravue\Models\Animal;
+use App\Laravue\Models\Specie;
 use App\Laravue\Models\Breed;
 use App\Laravue\Models\Client;
 use App\Laravue\Models\User;
@@ -80,6 +81,11 @@ class DatabaseSeeder extends Seeder
             'direction' => '001',
             'email' => '001',
             'status' => '001',
+        ]);
+
+        Specie::create([
+            'name' => 'gato',
+            'status' => 1,
         ]);
 
         $adminRole = Role::findByName(\App\Laravue\Acl::ROLE_ADMIN);

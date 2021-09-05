@@ -28,7 +28,7 @@
               class="filter-item"
               style="margin-left: 10px"
               type="primary"
-              icon="el-icon-edit"
+              icon="el-icon-plus"
               @click="handleCreate"
             >
               {{ $t('table.add') }}
@@ -118,29 +118,27 @@
           <el-table-column label="Estado" class-name="status-col" width="100">
             <template slot-scope="{row}">
               <div v-if="row.status == 1">
-                <el-tag type="success">
-                  Activo
+                <el-tag type="success" class="tag-item el-tag el-tag--medium el-tag--light">
+                  <i class="el-icon-open" /> Activo
                 </el-tag>
               </div>
               <div v-else>
                 <el-tag type="danger">
-                  Inactivo
+                  <i class="el-icon-turn-off" /> Inactivo
                 </el-tag>
               </div>
             </template>
           </el-table-column>
           <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <el-button type="primary" size="small" @click="handleUpdate(row)">
-                Editar
-              </el-button>
-              <el-button v-if="row.status==1" size="small" type="danger" @click="handleModifyStatus(row, 0)">
+              <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
+              <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
                 Inactivar
               </el-button>
-              <el-button v-if="row.status==0" size="small" type="success" @click="handleModifyStatus(row, 1)">
+              <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success" @click="handleModifyStatus(row, 1)">
                 Activar
               </el-button>
-              <el-button :v-if="true" size="small" type="success">
+              <el-button :v-if="true" size="small" type="success" @click="modalPet(row)">
                 Mascotas
               </el-button>
             </template>
@@ -152,14 +150,14 @@
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
           <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
             <el-form-item label="Tipo de documento" prop="document_type">
-                <el-select v-model="temp.document_type" placeholder="Seleccionar">
-                    <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                    </el-option>
-                </el-select>
+              <el-select v-model="temp.document_type" placeholder="Seleccionar">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
             </el-form-item>
             <el-form-item label="Numero Doc" prop="document_number">
               <el-input v-model="temp.document_number" />
@@ -190,19 +188,70 @@
           </div>
         </el-dialog>
 
+        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisiblePet">
+          <el-table
+            :key="table1Key"
+            v-loading="listLoading"
+            :data="listPets"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%"
+            @sort-change="sortChange"
+          >
+            <el-table-column
+              label="Nombre"
+              prop="name"
+              align="center"
+              width="150px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Tipo Mascota"
+              prop="specie"
+              align="center"
+              width="150px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.specie }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Sexo"
+              prop="sex"
+              align="center"
+              width="105px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.sex }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisiblePet = false">
+              {{ $t('table.cancel') }}
+            </el-button>
+          </div>
+        </el-dialog>
       </el-card>
     </el-row>
   </div>
 </template>
 <script>
-import { fetchList, createClient, updateClient } from '@/api/Client';
+import { fetchList, createClient, updateClient, listPet } from '@/api/Client';
+import waves from '@/directive/waves'; // Waves directive
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 
 export default {
   components: { Pagination },
+  directives: { waves },
   data() {
     return {
       tableKey: 0,
+      table1Key: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -213,12 +262,16 @@ export default {
       },
       listLoading: false,
       list: null,
+      listPets: null,
       showReviewer: false,
       dialogFormVisible: false,
+      dialogFormVisiblePet: false,
       dialogStatus: '',
+      total: 0,
       textMap: {
         update: 'Edit',
         create: 'Crear',
+        datos_mascotas: 'Lista Mascota',
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -257,7 +310,18 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('dataaa', data.items);
+      console.log('datos_clientes', data.items);
+    },
+    async getListPet() {
+      this.listLoading = true;
+      console.log('hola desde getlistpet: ');
+      console.log(this.temp);
+      const { data } = await listPet(this.temp);
+      this.listPets = data.items;
+
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      console.log('datos_mascota', data.items);
     },
     sortChange(data) {
       const { prop, order } = data;
@@ -342,6 +406,12 @@ export default {
       this.$nextTick(() => {
         this.$refs['dataForm'].clearValidate();
       });
+    },
+    modalPet(row) {
+      this.temp = Object.assign({}, row); // copy obj
+      this.dialogStatus = 'datos_mascotas';
+      this.dialogFormVisiblePet = true;
+      this.getListPet();
     },
 
   },

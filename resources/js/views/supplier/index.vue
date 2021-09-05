@@ -184,20 +184,23 @@
             </el-button>
           </div>
         </el-dialog>
-
       </el-card>
     </el-row>
   </div>
 </template>
 <script>
-import { fetchList, createPersonal, updatePersonal } from '@/api/personal';
+import { fetchList, createSupplier, updateSupplier } from '@/api/supplier';
+import waves from '@/directive/waves'; // Waves directive
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 
 export default {
+  name: 'ProveedoresList',
   components: { Pagination },
+  directives: { waves },
   data() {
     return {
       tableKey: 0,
+      table1Key: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -208,12 +211,15 @@ export default {
       },
       listLoading: false,
       list: null,
+      listPets: null,
       showReviewer: false,
       dialogFormVisible: false,
       dialogStatus: '',
+      total: 0,
       textMap: {
         update: 'Edit',
         create: 'Crear',
+        datos_mascotas: 'Lista Mascota',
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -221,8 +227,13 @@ export default {
       },
       temp: {
         id: undefined,
-        name: '',
-        observation: '',
+        first_name: '',
+        last_name: '',
+        document_type: '',
+        document_number: '',
+        phone: '',
+        direction: '',
+        email: '',
       },
       options: [
         {
@@ -252,7 +263,7 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('dataaa', data.items);
+      console.log('datos_proveedor', data.items);
     },
     sortChange(data) {
       const { prop, order } = data;
@@ -263,8 +274,13 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
-        observation: '',
+        first_name: '',
+        last_name: '',
+        document_type: '',
+        document_number: '',
+        phone: '',
+        direction: '',
+        email: '',
       };
     },
     handleCreate() {
@@ -280,7 +296,7 @@ export default {
         if (valid) {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
-          createPersonal(this.temp).then((response) => {
+          createSupplier(this.temp).then((response) => {
             this.list.push(this.temp);
             this.dialogFormVisible = false;
 
@@ -298,7 +314,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp);
-          updatePersonal(this.temp).then(() => {
+          updateSupplier(this.temp).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v);
@@ -320,7 +336,7 @@ export default {
     async handleModifyStatus(row, status) {
       this.listLoading = true;
       row.status = status;
-      await updatePersonal(row);
+      await updateSupplier(row);
 
       this.$message({
         message: 'Successful operation',

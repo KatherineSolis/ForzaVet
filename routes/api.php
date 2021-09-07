@@ -50,6 +50,7 @@ Route::namespace('Api')->group(function () {
         Route::post('/pet/create', 'PetController@store');
         Route::post('/pet/update/{id}', 'PetController@update');
         Route::get('/pet/client', 'PetController@client');
+        Route::post('/pet/consultar/{id}', 'PetController@petConsulta');
 
         //Client
         Route::get('/clients', 'ClientController@index');
@@ -91,6 +92,14 @@ Route::namespace('Api')->group(function () {
         Route::get('/histories', 'Clinic_historyController@index');
         Route::post('/history/create', 'Clinic_historyController@store');
         Route::post('/history/update/{id}', 'Clinic_historyController@update');
+
+        //Peluqueria
+        Route::get('/peluquerias', 'Clinic_historyController@peluqueriaList');
+
+        //Productos
+        Route::get('/productos', 'ProductController@index');
+        Route::post('/productos/create', 'ProductController@store');
+        Route::post('/productos/update/{id}', 'ProductController@update');
     });
 });
 

@@ -64,18 +64,18 @@ export const constantRoutes = [{
   hidden: true,
 },
 /* {
-                        path: '/404',
-                        redirect: { name: 'Page404' },
-                        component: () =>
-                            import ('@/views/error-page/404'),
-                        hidden: true,
-                    },
-                    {
-                        path: '/401',
-                        component: () =>
-                            import ('@/views/error-page/401'),
-                        hidden: true,
-                    },*/
+                            path: '/404',
+                            redirect: { name: 'Page404' },
+                            component: () =>
+                                import ('@/views/error-page/404'),
+                            hidden: true,
+                        },
+                        {
+                            path: '/401',
+                            component: () =>
+                                import ('@/views/error-page/401'),
+                            hidden: true,
+                        },*/
 {
   path: '',
   component: Layout,
@@ -112,14 +112,14 @@ export const asyncRoutes = [{
     name: 'pets',
     meta: { title: 'Mascotas', icon: 'qq', noCache: false },
   },
-    /* {
-                                                path: 'edit/:id(\\d+)',
-                                                component: () =>
-                                                    import ('@/views/pets/Edit'),
-                                                name: 'EditPet',
-                                                meta: { title: 'Edit Pet', noCache: true },
-                                                hidden: true,
-                                            },*/
+  {
+    path: 'pet/edit/:id(\\d+)',
+    component: () =>
+                    import ('@/views/pets/UserProfile'),
+    name: 'EditPet',
+    meta: { title: 'Edit Pet', noCache: true },
+    hidden: true,
+  },
   ],
 },
 {
@@ -181,9 +181,10 @@ export const asyncRoutes = [{
   },
   {
     path: 'crear',
+    name: 'peluqueria',
     component: () =>
                     import ('@/views/peluqueria/create'),
-    name: 'peluqueria',
+    meta: { title: 'Peluqueria' },
     hidden: true,
   },
   ],
@@ -215,7 +216,7 @@ adminRoutes,
   {
     path: 'productos', // When clicking this submenu, it will redirect to /#/foo/bar
     component: () =>
-                    import ('@/views/pets/index'),
+                    import ('@/views/products/index'),
     name: 'producto',
     meta: { title: 'Producto', icon: 'role' }, // bar submenu
   },

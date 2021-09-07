@@ -206,14 +206,14 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('visit', data.items);
+      // console.log('visit', data.items);
     },
     onSubmit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           const fechaHora = this.form.date.toLocaleString().split(' ');
           const formatFecha = (fechaHora[0]).split('/');
-          console.log(`${formatFecha[0]}-${formatFecha[1]}-${formatFecha[2]} ${fechaHora[1]}`);
+          // console.log(`${formatFecha[0]}-${formatFecha[1]}-${formatFecha[2]} ${fechaHora[1]}`);
           this.form.id = this.list[this.list.length - 1].id + 1;
           this.form.status = 1;
           this.form.date = `${formatFecha[2]}-${formatFecha[1]}-${formatFecha[0]} ${fechaHora[1]}`;

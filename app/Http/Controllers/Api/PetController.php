@@ -170,4 +170,46 @@ class PetController extends Controller
 
         return response()->json(new JsonResponse(['items' => $clients]));
     }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function petConsulta(Request $request, $id)
+    {
+        //
+        $pet = Pet::select(
+            'pets.id',
+            'pets.name AS nombre_mascota',
+            'pets.age',
+            'pets.sex',
+            'pets.weight',
+            'pets.color',
+            'pets.chip',
+            'pets.client_id',
+            PET::raw("CONCAT(first_name,' ',last_name) AS nombre_cliente"),
+            'pets.specie',
+            'pets.breed',
+            'pets.status'
+        )
+            ->join('clients', 'clients.id', '=', 'pets.client_id')
+            ->where('pets.id', $id)
+            ->get();
+        /*->update([
+                'name' => $request->name,
+                'age' => $request->age,
+                'sex' => $request->sex,
+                'weight' => $request->weight,
+                'color' => $request->color,
+                'chip' => $request->chip,
+                'client_id' => $request->client_id,
+                'specie' => $request->specie,
+                'breed_id' => $request->breed,
+                'status' => $request->status,
+            ]);*/
+        return response()->json(new JsonResponse(['items' => $pet]));
+    }
 }

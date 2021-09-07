@@ -158,6 +158,11 @@
                 Activar
               </el-button>
               <el-button type="primary" icon="el-icon-edit" size="small" @click="handleUpdate(row)" />
+              <router-link :to="'/mascotas/pet/edit/'+row.id">
+                <el-button type="primary" size="small" icon="el-icon-edit">
+                  Historial
+                </el-button>
+              </router-link>
               <el-button type="success" icon="el-icon-view" size="small" @click="handleView(row)" />
             </template>
           </el-table-column>

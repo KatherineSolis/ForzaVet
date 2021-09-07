@@ -70,7 +70,7 @@ class Clinic_historyController extends Controller
                 ]);
                 $antiparasitic->save();
             }
-        } else {
+        } else if ($request->antiparasitic_id != '') {
             $antiparasitic = new Antiparasitic_history([
                 'clinic_history_id' => $request->id,
                 'antiparasitic_id' => $request->antiparasitic_id,
@@ -141,5 +141,26 @@ class Clinic_historyController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function peluqueriaList(Request $request)
+    {
+        //
+        $searchParams = $request->all();
+        $reason = Arr::get($searchParams, 'reason', '');
+
+        $historial = Clinic_history::where('status', '=', '1')
+            //->OrWhere("reason", "in", "('Baño', 'Corte', 'Limpieza dental', 'Baño Medicado', 'Baño y corte', 'Baño medicado y corte')")
+            ->get()->toArray();
+
+        if (!empty($reason)) {
+            $historial = Clinic_history::where('reason', 'LIKE', '%' . $request->reason . '%')->get()->toArray();
+        }
+        return response()->json(new JsonResponse(['items' => $historial, 'total' => count($historial)]));
     }
 }

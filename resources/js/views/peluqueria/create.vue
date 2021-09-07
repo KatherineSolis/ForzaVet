@@ -14,7 +14,7 @@
 
         <div style="padding:25px 50px 0px 20px;">
 
-          <el-form ref="form" :model="form" label-width="100px">
+          <el-form ref="form" :rules="rules" :model="form" label-width="100px">
 
             <el-form-item label="Propietario" prop="client_id">
               <el-select v-model="form.client_id" placeholder="Seleccione Cliente..." style="width: 100%;" @input="getListPet">
@@ -30,6 +30,17 @@
               <el-select v-model="form.pet_id" placeholder="Seleccione mascota..." style="width: 100%;">
                 <el-option
                   v-for="item in optionsPet"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="Tipo" prop="reason">
+              <el-select v-model="form.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+                <el-option
+                  v-for="item in options"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -58,34 +69,81 @@
 
 <script>
 import { ListClient, ListPet, ListVaccine } from '@/api/appointment';
+import { fetchList, createHistory } from '@/api/clinic_history';
 export default {
   data() {
     return {
       listLoading: false,
+      list: null,
       optionsClient: [],
       optionsPet: [],
       optionsVaccine: [],
+      options: [
+        {
+          value: 'Baño',
+          label: 'Baño',
+        },
+        {
+          value: 'Corte',
+          label: 'Corte',
+        },
+        {
+          value: 'Limpieza dental',
+          label: 'Limpieza dental',
+        },
+        {
+          value: 'Baño Medicado',
+          label: 'Baño medicado',
+        },
+        {
+          value: 'Baño y corte',
+          label: 'Baño y corte',
+        },
+        {
+          value: 'Baño medicado y corte',
+          label: 'Baño medicado y corte',
+        }],
+      rules: {
+        client_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+        pet_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+        reason: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+      },
       form: {
-        name: '',
+        date: '',
+        personal_id: '',
         client_id: '',
         pet_id: '',
+        reason: '',
+        anamnesis: '',
+        vaccine_id: '',
+        antiparasitic_id: '',
         diagnostic: '',
+        pathology: '',
+        treatment: '',
+        prescription: '',
       },
     };
   },
   created() {
+    this.getList();
     this.getListClient();
     this.getListVaccine();
   },
   methods: {
-    onSubmit() {
-      this.$message('submit!');
-    },
     onCancel() {
       this.$message({
         message: 'cancel!',
         type: 'warning',
       });
+    },
+    async getList() {
+      this.listLoading = true;
+      const { data } = await fetchList();
+      this.list = data.items;
+
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      // console.log('visit', data.items);
     },
     async getListClient() {
       this.listLoading = true;
@@ -96,7 +154,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('cliente', this.optionsClient);
+      // console.log('cliente', this.optionsClient);
     },
     async getListPet() {
       this.listLoading = true;
@@ -107,7 +165,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('pet', this.optionsPet);
+      // console.log('pet', this.optionsPet);
     },
     async getListVaccine() {
       this.listLoading = true;
@@ -118,7 +176,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('cliente', this.optionsVaccine);
+      // console.log('cliente', this.optionsVaccine);
     },
 
     myFunction() {
@@ -137,6 +195,28 @@ export default {
       } else {
         x.style.display = 'block';
       }
+    },
+    onSubmit() {
+      this.$refs['form'].validate((valid) => {
+        if (valid) {
+          const hoy = new Date();
+          const fechaHora = `${hoy.getFullYear()}-${(hoy.getMonth()) + 1}-${hoy.getDate()} ${hoy.getHours()}:${hoy.getMinutes()}:${hoy.getSeconds()}`;
+          console.log(fechaHora);
+          this.form.id = this.list[this.list.length - 1].id + 1;
+          this.form.status = 1;
+          this.form.date = fechaHora;
+          createHistory(this.form).then((response) => {
+            this.list.push(this.form);
+            console.log(this.form);
+            this.$notify({
+              title: 'Success',
+              message: 'Created successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+        }
+      });
     },
 
   },

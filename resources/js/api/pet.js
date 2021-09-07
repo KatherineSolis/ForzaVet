@@ -30,3 +30,11 @@ export function ListClient() {
     method: 'get',
   });
 }
+
+export function getPet(data) {
+  return request({
+    url: '/pet/consultar/' + data,
+    method: 'post',
+    data,
+  });
+}

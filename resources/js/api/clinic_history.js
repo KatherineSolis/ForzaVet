@@ -23,3 +23,11 @@ export function updateHistory(data) {
     data,
   });
 }
+
+export function peluqueriaList(query) {
+  return request({
+    url: '/peluquerias',
+    method: 'get',
+    params: query,
+  });
+}

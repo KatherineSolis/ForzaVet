@@ -10,6 +10,27 @@
           </span></router-link>
 
         </div>
+        <div style="margin-bottom: 50px">
+          <div class="filter-container">
+            <el-input
+              v-model="listQuery.reason"
+              placeholder="Nombre"
+              style="width: 200px"
+              class="filter-item"
+              @keyup.enter.native="handleFilter"
+            />
+
+            <el-button
+              v-waves
+              class="filter-item"
+              type="primary"
+              icon="el-icon-search"
+              @click="handleFilter"
+            >
+              {{ $t('table.search') }}
+            </el-button>
+          </div>
+        </div>
 
         <div style="padding:25px 50px 0px 20px;">
           <el-table
@@ -25,22 +46,22 @@
 
             <el-table-column
               label="Fecha"
-              prop="document_type"
+              prop="date"
               align="center"
               width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_type }}</span>
+                <span>{{ scope.row.date }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="Propietario"
-              prop="document_number"
+              prop="client_id"
               align="center"
               width="180px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_number }}</span>
+                <span>{{ scope.row.client_id }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -50,37 +71,38 @@
               width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
+                <span>{{ scope.row.pet_id }} </span>
+                <!-- <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span> -->
               </template>
             </el-table-column>
             <el-table-column
               label="Tipo"
-              prop="direction"
+              prop="reason"
               align="center"
               min-width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.direction }}</span>
+                <span>{{ scope.row.reason }}</span>
               </template>
             </el-table-column>
 
             <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
               <template slot-scope="{row}">
-                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-                <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
+                <el-button type="primary" icon="el-icon-edit-outline" size="small" />
+                <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger">
                   Inactivar
                 </el-button>
-                <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success" @click="handleModifyStatus(row, 1)">
+                <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success">
                   Activar
                 </el-button>
-                <el-button :v-if="true" size="small" type="success" @click="modalPet(row)">
+                <el-button :v-if="true" size="small" type="success">
                   Mascotas
                 </el-button>
               </template>
             </el-table-column>
 
           </el-table>
-
+          <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
         </div>
       </el-card>
     </el-row>
@@ -89,26 +111,39 @@
 
 <script>
 import { ListClient, ListPet } from '@/api/appointment';
+import { peluqueriaList } from '@/api/clinic_history';
+import waves from '@/directive/waves'; // Waves directive
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 export default {
+  components: { Pagination },
+  directives: { waves },
   data() {
     return {
+      tableKey: 0,
+      total: 0,
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        reason: undefined,
+        type: undefined,
+        sort: '+id',
+      },
       listLoading: false,
+      list: null,
       optionsClient: [],
       optionsPet: [],
       optionsVaccine: [],
       form: {
-        name: '',
+        date: '',
         client_id: '',
         pet_id: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: '',
+        reason: '',
       },
     };
   },
   created() {
+    this.getList();
     this.getListClient();
   },
   methods: {
@@ -120,6 +155,25 @@ export default {
         message: 'cancel!',
         type: 'warning',
       });
+    },
+    handleFilter() {
+      this.listQuery.page = 1;
+      this.getList();
+    },
+    sortChange(data) {
+      const { prop, order } = data;
+      if (prop === 'id') {
+        this.sortByID(order);
+      }
+    },
+    async getList() {
+      this.listLoading = true;
+      const { data } = await peluqueriaList(this.listQuery);
+      this.list = data.items;
+
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      console.log('visit', data.items);
     },
     async getListClient() {
       this.listLoading = true;

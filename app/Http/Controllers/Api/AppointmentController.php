@@ -11,8 +11,12 @@ use App\Laravue\Models\Client;
 use App\Laravue\Models\Pet;
 use App\Laravue\Models\Vaccine;
 use App\Laravue\Models\Antiparasitic;
+use App\Laravue\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
 
 class AppointmentController extends Controller
 {
@@ -47,6 +51,13 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         //
+        $cliente = Client::find($request->client_id);
+        $details = [
+            'fecha_cita' => $request->registration_date,
+            'hora_cita' => $request->hours,
+            'name' => $cliente->first_name . ' ' . $cliente->last_name,
+        ];
+        Mail::to($cliente->email)->send(new \App\Mail\NotificationAppointment($details));
 
         $cita = new Appointment([
             'registration_date' => $request->registration_date,

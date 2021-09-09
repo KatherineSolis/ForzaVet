@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Laravue\JsonResponse;
 use App\Laravue\Models\Clinic_history;
 use App\Laravue\Models\Antiparasitic_history;
+use App\Laravue\Models\Client;
+use App\Laravue\Models\Personal;
+use App\Laravue\Models\Pet;
 use App\Laravue\Models\Vaccines_history;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 
 class Clinic_historyController extends Controller
 {
@@ -42,6 +46,26 @@ class Clinic_historyController extends Controller
     public function store(Request $request)
     {
         //
+        
+        if ($request->type) {
+            $veterinario = Personal::find($request->personal_id);
+            $veterinario = $veterinario->first_name . ' ' . $veterinario->last_name; 
+            $mascota = Pet::find($request->pet_id)->name;
+
+            $cliente = Client::find($request->client_id);
+            $details = [
+                'name_client' => $cliente->first_name . ' ' . $cliente->last_name,
+                'fecha' => $request->date,
+                'veterinario' => $veterinario,
+                'paciente' => $mascota,
+                'motivo' => $request->reason,
+                'diagnostico' => $request->diagnostic,
+                'tratamiento' => $request->treatment,
+                'receta' => $request->prescription,
+            ];
+            Mail::to($cliente->email)->send(new \App\Mail\NotificationPrescription($details));
+        }
+
         $historial = new Clinic_history([
             'date' => $request->date,
             'personal_id' => $request->personal_id,

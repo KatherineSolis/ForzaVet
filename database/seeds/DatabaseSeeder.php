@@ -45,7 +45,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         //
-        Breed::create([
+        /* Breed::create([
             'name' => 'Dalmata',
         ]);
 
@@ -70,7 +70,7 @@ class DatabaseSeeder extends Seeder
             'breed_id' => 1,
             'observation' => 'Es un perrito malo',
             'status' => 0
-        ]);
+        ]); */
 
         Client::create([
             'first_name' => 'Super',

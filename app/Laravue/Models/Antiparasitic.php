@@ -10,5 +10,6 @@ class Antiparasitic extends Model
     //
     protected $fillable = [
         'name_antiparasitic',
+        'status',
     ];
 }

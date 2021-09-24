@@ -1,13 +1,16 @@
 <template>
   <el-card v-if="user.nombre_cliente">
-    <el-tabs v-model="activeActivity" @tab-click="handleClick">
+    <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+      <i class="el-icon-back" />
+    </router-link>
+    <el-tabs v-model="activeActivity">
       <el-tab-pane label="Datos del paciente" name="first">
         <div class="user-activity">
           <div class="dndList" style="padding:20px;">
             <div style="width:50%;" class="dndList-list">
               <div style="border-left:4px solid #42b983;">
                 <span style="padding-left:10px;">Historial Clínico</span>
-                <span style="padding-left:10px;display:block; color:#566573;">Numero</span>
+                <span style="padding-left:10px;display:block; color:#566573;">#000{{ user.id }}</span>
               </div>
               <br><br>
               <div style="border-left:4px solid #42b983;">
@@ -22,7 +25,7 @@
               <br><br>
               <div style="border-left:4px solid #42b983;">
                 <span style="padding-left:10px;">¿Está castrado?</span>
-                <span style="padding-left:10px;display:block; color:#566573;">No</span>
+                <span style="padding-left:10px;display:block; color:#566573;">{{ user.castrated }}</span>
               </div>
             </div>
             <div style="width:40%;" class="dndList-list">
@@ -35,17 +38,17 @@
                 <br><br>
                 <div style="border-left:4px solid #42b983;">
                   <span style="padding-left:10px;">Peso</span>
-                  <span style="padding-left:10px;display:block;color:#566573;">Numero</span>
+                  <span style="padding-left:10px;display:block;color:#566573;">{{ user.weight }} Kg</span>
                 </div>
                 <br><br>
                 <div style="border-left:4px solid #42b983;">
                   <span style="padding-left:10px;">Color</span>
-                  <span style="padding-left:10px;display:block;color:#566573;">Numero</span>
+                  <span style="padding-left:10px;display:block;color:#566573;">{{ user.color }}</span>
                 </div>
                 <br><br>
                 <div style="border-left:4px solid #42b983;">
                   <span style="padding-left:10px;">Nivel de agresividad (0 a 5)</span>
-                  <span style="padding-left:10px;display:block;color:#566573;">3</span>
+                  <span style="padding-left:10px;display:block;color:#566573;">{{ user.aggressiveness }}</span>
                 </div>
               </div>
               <br><br>
@@ -61,16 +64,15 @@
 
             <span>Resultados</span>
 
-            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/servicio/nuevo"><!----><i class="el-icon-plus" /><span>
+            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" :to="'/mascotas/visit/new/'+ user.id"><!----><i class="el-icon-plus" /><span>
               Nuevo
             </span></router-link>
-
           </div>
           <br>
           <el-table
-            :key="tableKey"
+            :key="0"
             v-loading="listLoading"
-            :data="list"
+            :data="historial"
             border
             fit
             highlight-current-row
@@ -80,74 +82,148 @@
 
             <el-table-column
               label="Fecha"
-              prop="document_type"
+              prop="fecha"
               align="center"
               width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_type }}</span>
+                <span>{{ scope.row.date | parseTime('{y}-{m}-{d}') }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="Motivo"
-              prop="document_number"
+              prop="reason"
               align="center"
               min-width="180px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_number }}</span>
+                <span>{{ scope.row.reason }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="Veterinario"
-              prop="name"
+              prop="nombre_veterinario"
               align="center"
               width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
+                <span>{{ scope.row.nombre_veterinario }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
               <template slot-scope="{row}">
                 <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
+                <el-button type="danger" icon="el-icon-delete-solid" size="small" @click="handleModifyStatus(row, 0)" />
               </template>
             </el-table-column>
 
           </el-table>
+          <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+            <el-form ref="dataForm1" :rules="rules1" :model="form" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+              <el-form-item label="Fecha">
+                <el-date-picker v-model="form.date" type="datetime" placeholder="ingrese fecha" disabled />
+              </el-form-item>
+              <el-form-item label="Nombre Cliente" prop="client_id">
+                <el-select v-model="form.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                  <el-option
+                    v-for="(item, index) in optionsClient"
+                    :key="'B'+index"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Nombre mascota" prop="name">
+                <el-input v-model="form.name" type="text" style="width: 100%;" disabled />
+              </el-form-item>
+              <el-form-item label="Motivo de visita" prop="reason">
+                <el-input v-model="form.reason" type="textarea" style="width: 100%;" />
+              </el-form-item>
+              <el-form-item label="Anamnesis" prop="anamnesis">
+                <el-input v-model="form.anamnesis" type="textarea" />
+              </el-form-item>
+              <el-form-item label="Diagnostivo" prop="diagnostic">
+                <el-input v-model="form.diagnostic" type="textarea" />
+              </el-form-item>
+              <el-form-item label="Patologia" prop="pathology">
+                <el-input v-model="form.pathology" type="textarea" />
+              </el-form-item>
+              <el-form-item label="Tratamiento" prop="treatment">
+                <el-input v-model="form.treatment" type="textarea" />
+              </el-form-item>
+              <el-form-item label="Prescripcion" prop="prescription">
+                <el-input v-model="form.prescription" type="textarea" />
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">
+                {{ $t('table.cancel') }}
+              </el-button>
+              <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+                {{ $t('table.confirm') }}
+              </el-button>
+            </div>
+          </el-dialog>
         </div>
       </el-tab-pane>
       <el-tab-pane label="Vacunas" name="third">
         <div class="block">
           <div slot="header" class="clearfix">
 
-            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/servicio/vacuna"><!----><i class="el-icon-plus" /><span>
+            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" :to="'/servicio/vaccine/create/'+user.id"><!----><i class="el-icon-plus" /><span>
               Nuevo
             </span></router-link>
 
           </div>
           <el-timeline>
-            <el-timeline-item timestamp="2019/4/17" placement="top">
+            <el-timeline-item v-for="(item, index) in vaccine" :key="'D'+index" :timestamp="item.date" placement="top">
               <el-card>
-                <h4>Nombre: Rabia</h4>
-                <p>1 ml</p>
+                <h4>Nombre vacuna: {{ item.name_vaccines }}</h4>
+                <p>{{ item.weight }} Kg - {{ item.vaccine_observation }}</p>
+                <el-button type="danger" icon="el-icon-delete" size="small" @click="handleModifyStatus2(item, 0)" />
               </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/18" placement="top">
-              <el-card>
-                <h4>Nombre: nombre de la vacuna</h4>
-                <p>Primera dosis</p>
-                <p>50kg - 1 ml</p>
-              </el-card>
+              <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible2">
+                <el-form ref="dataForm2" :rules="rules2" :model="form1" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+                  <el-form-item label="Fecha">
+                    <el-date-picker v-model="form1.date" type="datetime" placeholder="ingrese fecha" disabled />
+                  </el-form-item>
+                  <el-form-item label="Nombre Cliente" prop="client_id">
+                    <el-select v-model="form1.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                      <el-option
+                        v-for="(item, index) in optionsClient"
+                        :key="'B'+index"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="Nombre mascota" prop="name">
+                    <el-input v-model="form1.name" type="text" style="width: 100%;" disabled />
+                  </el-form-item>
+                  <el-form-item label="Tipo Vacuna" prop="vaccines_id">
+                    <el-select v-model="form1.vaccines_id" placeholder="Seleccione tipo..." style="width: 100%;">
+                      <el-option
+                        v-for="(item, index) in optionsVaccine"
+                        :key="'cl'+index"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                  </el-form-item>
 
-            </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/19" placement="top">
-              <el-card>
-                <h4>Nombre: nombre de la vacuna</h4>
-                <p>Primera dosis</p>
-                <p>50kg - 1 ml</p>
-              </el-card>
+                  <el-form-item label="Detalles">
+                    <el-input v-model="form1.vaccine_observation" type="textarea" style="width: 100%;" />
+                  </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                  <el-button @click="dialogFormVisible2 = false">
+                    {{ $t('table.cancel') }}
+                  </el-button>
+                  <el-button type="primary" @click="dialogStatus==='create'?createData():updateData2()">
+                    {{ $t('table.confirm') }}
+                  </el-button>
+                </div>
+              </el-dialog>
             </el-timeline-item>
           </el-timeline>
         </div>
@@ -156,167 +232,78 @@
         <div class="block">
           <div slot="header" class="clearfix">
 
-            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/servicio/antidesparasitario"><!----><i class="el-icon-plus" /><span>
+            <router-link type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" :to="'/servicio/antiparasitic/create/'+ user.id"><!----><i class="el-icon-plus" /><span>
               Nuevo
             </span></router-link>
 
           </div>
           <el-timeline>
-            <el-timeline-item timestamp="2019/4/17" placement="top">
+            <el-timeline-item v-for="(item, index) in antiparasitic" :key="'E'+index" :timestamp="item.date" placement="top">
               <el-card>
-                <h4>Nombre: Rabia</h4>
-                <p>1 ml</p>
+                <h4>Nombre Desparacitante: {{ item.name_antiparasitic }}</h4>
+                <p>{{ item.weight }} Kg - {{ item.antiparasitic_observation }}</p>
+                <el-button type="danger" icon="el-icon-delete" size="small" @click="handleModifyStatus3(item, 0)" />
               </el-card>
-            </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/18" placement="top">
-              <el-card>
-                <h4>Nombre: nombre de la vacuna</h4>
-                <p>Primera dosis</p>
-                <p>50kg - 1 ml</p>
-              </el-card>
+              <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible3">
+                <el-form ref="dataForm3" :rules="rules3" :model="form2" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+                  <el-form-item label="Fecha">
+                    <el-date-picker v-model="form2.date" type="datetime" placeholder="ingrese fecha" disabled />
+                  </el-form-item>
+                  <el-form-item label="Nombre Cliente" prop="client_id">
+                    <el-select v-model="form2.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                      <el-option
+                        v-for="(item, index) in optionsClient"
+                        :key="'B'+index"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="Nombre mascota" prop="name">
+                    <el-input v-model="form2.name" type="text" style="width: 100%;" disabled />
+                  </el-form-item>
+                  <el-form-item label="Tipo Vacuna" prop="antiparasitic_id">
+                    <el-select v-model="form2.antiparasitic_id" placeholder="Seleccione tipo..." style="width: 100%;">
+                      <el-option
+                        v-for="(item, index) in optionsAntiparasitic"
+                        :key="'ckl'+index"
+                        :label="item.label"
+                        :value="item.value"
+                      />
+                    </el-select>
+                  </el-form-item>
 
-            </el-timeline-item>
-            <el-timeline-item timestamp="2019/4/19" placement="top">
-              <el-card>
-                <h4>Nombre: nombre de la vacuna</h4>
-                <p>Primera dosis</p>
-                <p>50kg - 1 ml</p>
-              </el-card>
+                  <el-form-item label="Detalles">
+                    <el-input v-model="form2.antiparasitic_observation" type="textarea" style="width: 100%;" />
+                  </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                  <el-button @click="dialogFormVisible3 = false">
+                    {{ $t('table.cancel') }}
+                  </el-button>
+                  <el-button type="primary" @click="dialogStatus==='create'?createData():updateData3()">
+                    {{ $t('table.confirm') }}
+                  </el-button>
+                </div>
+              </el-dialog>
             </el-timeline-item>
           </el-timeline>
-        </div>
-      </el-tab-pane>
-      <el-tab-pane label="Archivos" name="fifth">
-        <div class="user-activity">
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDkaQO69Fro8SZLTVZQ75JH2R0T-sn5yIA_lKGwvvgQ0R0BoQtUQ"
-                alt="user image"
-              >
-              <span class="username text-muted">
-                <a href="#">Iron Man</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Shared publicly - 7:30 PM today</span>
-            </div>
-            <p>
-              Lorem ipsum represents a long-held tradition for designers,
-              typographers and the like. Some people hate it and argue for
-              its demise, but others ignore the hate as they create awesome
-              tools to help create filler text for everyone from bacon lovers
-              to Charlie Sheen fans.
-            </p>
-            <ul class="list-inline">
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <i class="el-icon-share" /> Share
-                </a>
-              </li>
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="like" />Like
-                </a>
-              </li>
-              <li class="pull-right">
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="comment" />Comments
-                  (5)
-                </a>
-              </li>
-            </ul>
-            <el-input placeholder="Type a comment" />
-          </div>
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMMN-8f9CQQ3MKJpboBJIqaiJ2Wus2Tf4w_vx9STtalxrY3qGJ"
-                alt="user image"
-              >
-              <span class="username text-muted">
-                <a href="#">Captain American</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Sent you a message - yesterday</span>
-            </div>
-            <p>
-              Lorem ipsum represents a long-held tradition for designers,
-              typographers and the like. Some people hate it and argue for
-              its demise, but others ignore the hate as they create awesome
-              tools to help create filler text for everyone from bacon lovers
-              to Charlie Sheen fans.
-            </p>
-            <el-input placeholder="Response">
-              <el-button slot="append">
-                Send
-              </el-button>
-            </el-input>
-          </div>
-          <div class="post">
-            <div class="user-block">
-              <img
-                class="img-circle img-bordered-sm"
-                src="https://cdn3.iconfinder.com/data/icons/movies-3/32/daredevil-superhero-marvel-comics-mutant-avatar-512.png"
-                alt="User Image"
-              >
-              <span class="username">
-                <a href="#">Daredevil</a>
-                <a href="#" class="pull-right btn-box-tool">
-                  <i class="fa fa-times" />
-                </a>
-              </span>
-              <span class="description">Posted 4 photos - 2 days ago</span>
-            </div>
-            <div class="user-images">
-              <el-carousel :interval="6000" type="card" height="200px">
-                <el-carousel-item v-for="item in carouselImages" :key="item">
-                  <img :src="item" class="image">
-                </el-carousel-item>
-              </el-carousel>
-            </div>
-            <ul class="list-inline">
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <i class="el-icon-share" /> Share
-                </a>
-              </li>
-              <li>
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="like" />Like
-                </a>
-              </li>
-              <li class="pull-right">
-                <a href="#" class="link-black text-sm">
-                  <svg-icon icon-class="comment" />Comments
-                  (5)
-                </a>
-              </li>
-            </ul>
-            <el-input placeholder="Type a comment" />
-          </div>
         </div>
       </el-tab-pane>
       <el-tab-pane label="Estética y baños" name="sixth">
         <div class="user-activity">
           <div slot="header" class="clearfix">
             <span>Resultados</span>
-
-            <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/servicio/crear"><!----><i class="el-icon-plus" /><span>
+            <router-link type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" :to="'/servicio/peluqueria/create/'+ user.id"><!----><i class="el-icon-plus" /><span>
               Nuevo
             </span></router-link>
 
           </div>
           <br>
           <el-table
-            :key="tableKey"
+            :key="1"
             v-loading="listLoading"
-            :data="list"
+            :data="peluqueria"
             border
             fit
             highlight-current-row
@@ -326,42 +313,83 @@
 
             <el-table-column
               label="Paciente"
-              prop="document_type"
+              prop="diagnostic"
               align="center"
-              width="150px"
+              width="180px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_type }}</span>
+                <span>{{ scope.row.diagnostic }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="Tipo"
-              prop="document_number"
+              prop="reason"
               align="center"
-              min-width="180px"
+              min-width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.document_number }}</span>
+                <span>{{ scope.row.reason }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="Fecha"
-              prop="name"
+              prop="date"
               align="center"
               width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
+                <span>{{ scope.row.date | parseTime('{y}-{m}-{d}') }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
               <template slot-scope="{row}">
-                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
+                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate1(row)" />
+                <el-button type="danger" icon="el-icon-delete-solid" size="small" @click="handleModifyStatus1(row, 0)" />
               </template>
             </el-table-column>
 
           </el-table>
+          <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible1">
+            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+              <el-form-item label="Fecha">
+                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" disabled />
+              </el-form-item>
+              <el-form-item label="Nombre Cliente" prop="client_id">
+                <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                  <el-option
+                    v-for="(item, index) in optionsClient"
+                    :key="'Z'+index"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Nombre mascota" prop="name">
+                <el-input v-model="temp.name" type="text" style="width: 100%;" disabled />
+              </el-form-item>
+              <el-form-item label="Tipo" prop="reason">
+                <el-select v-model="temp.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+                  <el-option
+                    v-for="(item, index) in options"
+                    :key="'c'+index"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Diagnostivo" prop="diagnostic">
+                <el-input v-model="temp.diagnostic" type="textarea" />
+              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible1 = false">
+                {{ $t('table.cancel') }}
+              </el-button>
+              <el-button type="primary" @click="dialogStatus==='create'?createData():updateData1()">
+                {{ $t('table.confirm') }}
+              </el-button>
+            </div>
+          </el-dialog>
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -369,10 +397,15 @@
 </template>
 
 <script>
-import Resource from '@/api/resource';
-const userResource = new Resource('users');
+import { ListClient, ListVaccine, ListAntiparasitic } from '@/api/appointment';
+import { updateHistory } from '@/api/clinic_history';
+// import Resource from '@/api/resource';
+import waves from '@/directive/waves'; // Waves directive
+// const userResource = new Resource('users');
 
 export default {
+  inject: ['reload'],
+  directives: { waves },
   props: {
     user: {
       type: Object,
@@ -385,9 +418,146 @@ export default {
         };
       },
     },
+    historial: {
+      type: Array,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: [],
+        };
+      },
+    },
+    vaccine: {
+      type: Array,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: [],
+        };
+      },
+    },
+    antiparasitic: {
+      type: Array,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: [],
+        };
+      },
+    },
+    peluqueria: {
+      type: Array,
+      default: () => {
+        return {
+          name: '',
+          email: '',
+          avatar: '',
+          roles: [],
+        };
+      },
+    },
   },
   data() {
     return {
+      listLoading: false,
+      listLoading1: false,
+      dialogFormVisible: false,
+      dialogFormVisible1: false,
+      dialogFormVisible2: false,
+      dialogFormVisible3: false,
+      dialogStatus: '',
+      carVaccine: '',
+      carAntiparasitic: '',
+      optionsClient: [],
+      optionsPet: [],
+      optionsVaccine: [],
+      optionsAntiparasitic: [],
+      options: [
+        {
+          value: 'Baño',
+          label: 'Baño',
+        },
+        {
+          value: 'Corte',
+          label: 'Corte',
+        },
+        {
+          value: 'Limpieza dental',
+          label: 'Limpieza dental',
+        },
+        {
+          value: 'Baño Medicado',
+          label: 'Baño medicado',
+        },
+        {
+          value: 'Baño y corte',
+          label: 'Baño y corte',
+        },
+        {
+          value: 'Baño medicado y corte',
+          label: 'Baño medicado y corte',
+        }],
+
+      rules: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      rules1: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      rules2: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      rules3: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      textMap: {
+        update: 'Editar',
+        create: 'Crear',
+      },
+      form: {
+        id: undefined,
+        date: '',
+        personal_id: '',
+        client_id: '',
+        pet_id: '',
+        reason: '',
+        anamnesis: '',
+        vaccine_id: '',
+        vaccine_observation: '',
+        antiparasitic_id: '',
+        antiparasitic_observation: '',
+        diagnostic: '',
+        pathology: '',
+        treatment: '',
+        prescription: '',
+
+      },
+      temp: {
+        id: undefined,
+        date: '',
+        personal_id: '',
+        client_id: '',
+        pet_id: '',
+        reason: '',
+        anamnesis: '',
+        vaccine_id: '',
+        vaccine_observation: '',
+        antiparasitic_id: '',
+        antiparasitic_observation: '',
+        diagnostic: '',
+        pathology: '',
+        treatment: '',
+        prescription: '',
+
+      },
+      form1: {},
+      form2: {},
       activeActivity: 'first',
       carouselImages: [
         'https://cdn.laravue.dev/photo1.png',
@@ -398,26 +568,224 @@ export default {
       updating: false,
     };
   },
+  created() {
+    this.getListClient();
+    this.getListVaccine();
+    this.getListAntiparasitic();
+  },
   methods: {
-    handleClick(tab, event) {
+    /* handleClick(tab, event) {
       console.log('Switching tab ', tab, event);
+    },*/
+    sortChange(data) {
+      const { prop, order } = data;
+      if (prop === 'id') {
+        this.sortByID(order);
+      }
     },
-    onSubmit() {
-      this.updating = true;
-      userResource
-        .update(this.user.id, this.user)
-        .then(response => {
-          this.updating = false;
-          this.$message({
-            message: 'User information has been updated successfully',
-            type: 'success',
-            duration: 5 * 1000,
+    async getListClient() {
+      this.listLoading1 = true;
+      const { data } = await ListClient();
+
+      for (const i in data.items) {
+        this.optionsClient.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
+      }
+      // Just to simulate the time of the request
+      // console.log(this.optionsClient);
+      this.listLoading1 = false;
+    },
+    // metodo de estetica
+    updateData1() {
+      console.log(this.$refs['dataForm']);
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          updateHistory(this.temp).then(() => {
+            for (const v of this.peluqueria) {
+              if (v.id === this.temp.id) {
+                const index1 = this.peluqueria.indexOf(v);
+                this.peluqueria.splice(index1, 1, this.temp);
+                break;
+              }
+            }
+            this.dialogFormVisible1 = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
           });
-        })
-        .catch(error => {
-          console.log(error);
-          this.updating = false;
-        });
+        }
+      });
+    },
+    // metodo de consulta medica
+    updateData() {
+      // console.log(this.$refs['dataForm1']);
+      this.$refs['dataForm1'].validate((valid) => {
+        if (valid) {
+          updateHistory(this.form).then(() => {
+            for (const v of this.historial) {
+              if (v.id === this.form.id) {
+                const index = this.historial.indexOf(v);
+                this.historial.splice(index, 1, this.form);
+                break;
+              }
+            }
+            this.dialogFormVisible = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+        }
+      });
+    },
+    // metodo vacunas
+    updateData2() {
+      // console.log(this.$refs['dataForm2'][this.carVaccine]);
+      this.$refs['dataForm2'][this.carVaccine].validate((valid) => {
+        if (valid) {
+          updateHistory(this.form1).then(() => {
+            for (const v of this.vaccine) {
+              if (v.id === this.form1.id) {
+                const index1 = this.vaccine.indexOf(v);
+                this.vaccine.splice(index1, 1, this.form1);
+                break;
+              }
+            }
+            this.dialogFormVisible2 = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+        }
+      });
+    },
+    // metodo desparacitacion
+    updateData3() {
+      // console.log(this.$refs['dataForm2'][this.carVaccine]);
+      this.$refs['dataForm3'][this.carAntiparasitic].validate((valid) => {
+        if (valid) {
+          updateHistory(this.form2).then(() => {
+            for (const v of this.antiparasitic) {
+              if (v.id === this.form2.id) {
+                const index1 = this.antiparasitic.indexOf(v);
+                this.antiparasitic.splice(index1, 1, this.form2);
+                break;
+              }
+            }
+            this.dialogFormVisible3 = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+        }
+      });
+    },
+    // estetica y peluqueria
+    handleUpdate1(row) {
+      this.temp = Object.assign({}, row); // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible1 = true;
+    },
+    // visita medica
+    handleUpdate(row) {
+      this.form = Object.assign({}, row); // copy obj
+      this.form.timestamp = new Date(this.form.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible = true;
+    },
+    // editar vacunas
+    handleUpdate2(row, position) {
+      this.form1 = Object.assign({}, row); // copy obj
+      this.carVaccine = position;
+      this.form1.timestamp = new Date(this.form1.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible2 = true;
+    },
+    // editar desparasitante
+    handleUpdate3(row, position) {
+      this.form2 = Object.assign({}, row); // copy obj
+      this.carAntiparasitic = position;
+      this.form2.timestamp = new Date(this.form2.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible3 = true;
+    },
+    async getListVaccine() {
+      this.listLoading = true;
+      const { data } = await ListVaccine();
+
+      for (const i in data.items) {
+        this.optionsVaccine.push({ value: data.items[i].id, label: data.items[i].name_vaccines });
+      }
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      // console.log('cliente', this.optionsVaccine);
+    },
+    async getListAntiparasitic() {
+      this.listLoading = true;
+      const { data } = await ListAntiparasitic();
+
+      for (var i in data.items) {
+        this.optionsAntiparasitic.push({ value: data.items[i].id, label: data.items[i].name_antiparasitic });
+      }
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      // console.log('desparacitante', this.optionsAntiparasitic);
+    },
+    async handleModifyStatus(row, status) {
+      this.listLoading = true;
+      row.status = status;
+      await updateHistory(row);
+      this.$router.go(0);
+
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
+      this.listLoading = false;
+    },
+    async handleModifyStatus1(row, status) {
+      this.listLoading = true;
+      row.status = status;
+      await updateHistory(row);
+      this.$router.go(0);
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
+      this.listLoading = false;
+    },
+    async handleModifyStatus2(row, status) {
+      this.listLoading = true;
+      row.status = status;
+      await updateHistory(row);
+      this.$router.go(0);
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
+      this.listLoading = false;
+    },
+    async handleModifyStatus3(row, status) {
+      this.listLoading = true;
+      row.status = status;
+      await updateHistory(row);
+      this.$router.go(0);
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
+      this.listLoading = false;
     },
   },
 };

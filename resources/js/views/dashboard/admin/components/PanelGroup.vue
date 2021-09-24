@@ -7,9 +7,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Visits
+            Usuarios
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="this.total_usuarios" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -20,9 +20,9 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            Clientes
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="this.total_clientes" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -33,22 +33,22 @@
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            Pacientes
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="this.total_mascotas" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
-        <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
+        <div class="card-panel-icon-wrapper icon-people">
+          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            Veterinarios
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="this.total_personals" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -57,14 +57,39 @@
 
 <script>
 import CountTo from 'vue-count-to';
+import { fetchList } from '@/api/dashboard';
 
 export default {
   components: {
     CountTo,
   },
+  data() {
+    return {
+      listLoading: false,
+      total_usuarios: 0,
+      total_mascotas: 0,
+      total_clientes: 0,
+      total_personals: 0,
+    };
+  },
+  created() {
+    this.getList();
+  },
   methods: {
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type);
+    },
+    async getList() {
+      this.listLoading = true;
+      const { data } = await fetchList();
+      this.total_usuarios = data.total_usuario;
+      this.total_mascotas = data.total_mascotas;
+      this.total_clientes = data.total_clientes;
+      this.total_personals = data.total_personals;
+      // Just to simulate the time of the request
+      this.listLoading = false;
+      // console.log('visit', data.items);
+      // console.log(this.total_usuarios);
     },
   },
 };

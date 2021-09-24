@@ -16,8 +16,9 @@ class Pet extends Model
         'chip',
         'client_id',
         'specie',
-        'breed_id',
-        'registration_date',
+        'breed',
+        'castrated',
+        'aggressiveness',
         'status',
     ];
 }

@@ -87,11 +87,25 @@ Route::namespace('Api')->group(function () {
         Route::get('/cita/pet', 'AppointmentController@mascota');
         Route::get('/cita/vaccine', 'AppointmentController@vaccines');
         Route::get('/cita/antiparasitic', 'AppointmentController@antiparasitic');
+        Route::post('/cita/consultar/{id}', 'AppointmentController@citaConsulta');
+        Route::post('/cita/history/{id}', 'AppointmentController@clinicConsulta');
+        Route::get('/cita/list/pet', 'AppointmentController@todasMascota');
 
         //Clinic_history
         Route::get('/histories', 'Clinic_historyController@index');
         Route::post('/history/create', 'Clinic_historyController@store');
         Route::post('/history/update/{id}', 'Clinic_historyController@update');
+        Route::post('/peluqueria/create/{id}', 'Clinic_historyController@peluqueriaCreate');
+
+        //Vaccine
+        Route::get('/vaccines', 'VaccineController@index');
+        Route::post('/vaccine/create', 'VaccineController@store');
+        Route::post('/vaccine/update/{id}', 'VaccineController@update');
+
+        //Antiparasitaric
+        Route::get('/antiparasitaric', 'AntiparasitaryController@index');
+        Route::post('/antiparasitaric/create', 'AntiparasitaryController@store');
+        Route::post('/antiparasitaric/update/{id}', 'AntiparasitaryController@update');
 
         //Peluqueria
         Route::get('/peluquerias', 'Clinic_historyController@peluqueriaList');
@@ -100,6 +114,9 @@ Route::namespace('Api')->group(function () {
         Route::get('/productos', 'ProductController@index');
         Route::post('/productos/create', 'ProductController@store');
         Route::post('/productos/update/{id}', 'ProductController@update');
+
+        //Dashboard
+        Route::get('/dashboard', 'DashboardController@index');
     });
 });
 

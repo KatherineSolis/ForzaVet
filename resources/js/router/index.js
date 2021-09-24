@@ -64,18 +64,18 @@ export const constantRoutes = [{
   hidden: true,
 },
 /* {
-                            path: '/404',
-                            redirect: { name: 'Page404' },
-                            component: () =>
-                                import ('@/views/error-page/404'),
-                            hidden: true,
-                        },
-                        {
-                            path: '/401',
-                            component: () =>
-                                import ('@/views/error-page/401'),
-                            hidden: true,
-                        },*/
+                                    path: '/404',
+                                    redirect: { name: 'Page404' },
+                                    component: () =>
+                                        import ('@/views/error-page/404'),
+                                    hidden: true,
+                                },
+                                {
+                                    path: '/401',
+                                    component: () =>
+                                        import ('@/views/error-page/401'),
+                                    hidden: true,
+                                },*/
 {
   path: '',
   component: Layout,
@@ -93,12 +93,11 @@ export const constantRoutes = [{
 export const asyncRoutes = [{
   path: '',
   component: Layout,
-  redirect: 'client',
   children: [{
     path: 'client',
     component: () =>
                 import ('@/views/client/Index'),
-    name: 'Client',
+    name: 'client',
     meta: { title: 'Clientes', icon: 'peoples', noCache: false },
   }],
 },
@@ -120,27 +119,24 @@ export const asyncRoutes = [{
     meta: { title: 'Edit Pet', noCache: true },
     hidden: true,
   },
-  ],
-},
-{
-  path: '/historial',
-  component: Layout,
-  children: [{
-    path: 'historial',
+  {
+    path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'newVisitt',
     component: () =>
-                import ('@/views/visit/index'),
-    name: 'historial',
-    meta: { title: 'Historial', icon: 'form', noCache: false },
-  }],
+                    import ('@/views/visit/clinic_history'),
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+    hidden: true,
+  },
+  ],
 },
 {
   path: '/agenda',
   component: Layout,
   redirect: '/agenda/index',
-  name: 'Agenda',
+  name: 'agenda',
   meta: {
     title: 'Agenda',
-    icon: 'el-icon-date', // Using SVG icon
+    icon: 'clipboard', // Using SVG icon
   },
   children: [{
     path: 'citas', // When clicking this submenu, it will redirect to /#/foo/index
@@ -152,7 +148,17 @@ export const asyncRoutes = [{
   {
     path: 'listarcita', // When clicking this submenu, it will redirect to /#/foo/bar
     name: 'listarcita',
+    component: () =>
+                    import ('@/views/citas/index'),
     meta: { title: 'Listar Citas', icon: 'list' }, // bar submenu
+  },
+  {
+    path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'newVisitt',
+    component: () =>
+                    import ('@/views/visit/index'),
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+    hidden: true,
   },
   ],
 },
@@ -169,7 +175,7 @@ export const asyncRoutes = [{
     path: 'visit', // When clicking this submenu, it will redirect to /#/foo/index
     name: 'visitList',
     component: () =>
-                    import ('@/views/visit/index'),
+                    import ('@/views/visit/list'),
     meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
   },
   {
@@ -180,48 +186,84 @@ export const asyncRoutes = [{
     meta: { title: 'Peluquería', icon: 'list' }, // bar submenu
   },
   {
-    path: 'crear',
+    path: 'peluqueria/create/:id(\\d+)',
     name: 'peluqueria',
     component: () =>
                     import ('@/views/peluqueria/create'),
     meta: { title: 'Peluqueria' },
     hidden: true,
   },
+  {
+    path: 'vaccine/create/:id(\\d+)',
+    component: () =>
+                    import ('@/views/vaccine/create'),
+    meta: { title: 'Vacunación' },
+    hidden: true,
+  },
+  {
+    path: 'antiparasitic/create/:id(\\d+)',
+    component: () =>
+                    import ('@/views/antiparasitic/create'),
+    meta: { title: 'Antiparasitario' },
+    hidden: true,
+  },
   ],
+},
+{
+  path: '',
+  component: Layout,
+  children: [{
+    path: 'vaccine',
+    component: () =>
+                import ('@/views/vaccine/index'),
+    name: 'vacunas',
+    meta: { title: 'Vacunas', icon: 'peoples', noCache: false },
+  }],
+},
+{
+  path: '',
+  component: Layout,
+  children: [{
+    path: 'antiparasitaric',
+    component: () =>
+                import ('@/views/antiparasitic/index'),
+    name: 'antiparasitaric',
+    meta: { title: 'Antiparasitarios', icon: 'peoples', noCache: false },
+  }],
 },
 adminRoutes,
-{
-  path: '/inventario',
-  component: Layout,
-  redirect: '/inventario/index',
-  name: 'inventario',
-  meta: {
-    title: 'Inventario',
-    icon: 'user', // Using SVG icon
-  },
-  children: [{
-    path: 'proveedores', // When clicking this submenu, it will redirect to /#/foo/index
-    component: () =>
-                    import ('@/views/supplier/index'),
-    name: 'proveedoresList',
-    meta: { title: 'Proveedores', icon: 'role' }, // foo submenu
-  },
-  {
-    path: 'category', // When clicking this submenu, it will redirect to /#/foo/bar
-    component: () =>
-                    import ('@/views/category/index'),
-    name: 'category',
-    meta: { title: 'Categoria', icon: 'role' }, // bar submenu
-  },
-  {
-    path: 'productos', // When clicking this submenu, it will redirect to /#/foo/bar
-    component: () =>
-                    import ('@/views/products/index'),
-    name: 'producto',
-    meta: { title: 'Producto', icon: 'role' }, // bar submenu
-  },
-  ],
-},
+/* {
+            path: '/inventario',
+            component: Layout,
+            redirect: '/inventario/index',
+            name: 'inventario',
+            meta: {
+                title: 'Inventario',
+                icon: 'user', // Using SVG icon
+            },
+            children: [{
+                    path: 'proveedores', // When clicking this submenu, it will redirect to /#/foo/index
+                    component: () =>
+                        import ('@/views/supplier/index'),
+                    name: 'proveedoresList',
+                    meta: { title: 'Proveedores', icon: 'role' }, // foo submenu
+                },
+                {
+                    path: 'category', // When clicking this submenu, it will redirect to /#/foo/bar
+                    component: () =>
+                        import ('@/views/category/index'),
+                    name: 'category',
+                    meta: { title: 'Categoria', icon: 'role' }, // bar submenu
+                },
+                {
+                    path: 'productos', // When clicking this submenu, it will redirect to /#/foo/bar
+                    component: () =>
+                        import ('@/views/products/index'),
+                    name: 'producto',
+                    meta: { title: 'Producto', icon: 'role' }, // bar submenu
+                },
+            ],
+        },*/
 {
   path: '/404',
   component: () =>

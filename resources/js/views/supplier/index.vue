@@ -3,7 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Cliente</span>
+          <span>Proveedores</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -217,7 +217,7 @@ export default {
       dialogStatus: '',
       total: 0,
       textMap: {
-        update: 'Edit',
+        update: 'Editar',
         create: 'Crear',
         datos_mascotas: 'Lista Mascota',
       },
@@ -263,7 +263,6 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('datos_proveedor', data.items);
     },
     sortChange(data) {
       const { prop, order } = data;

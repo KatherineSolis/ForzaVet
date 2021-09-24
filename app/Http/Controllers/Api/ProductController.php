@@ -66,7 +66,7 @@ class ProductController extends Controller
         $b =  '/';
         $file = str_replace($a, $b, $file);
 
-        dd($request);
+        //dd($request);
         $products = new Product([
             'suppliers_id' => $request->suppliers_id,
             'category_id' => $request->category_id,

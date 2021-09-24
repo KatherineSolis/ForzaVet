@@ -187,6 +187,7 @@ export default {
       editor: 'Editor. Have access to most of pages, full permission with articles and related resources.',
       user: 'Normal user. Have access to some pages',
       visitor: 'Visitor. Have access to static pages, should not have any writable permission',
+      veterinary: 'Veterinary. Have access and permission to most of pages except user, type vaccine, type antiparasitic and permission page.',
     },
   },
 };

@@ -31,3 +31,11 @@ export function peluqueriaList(query) {
     params: query,
   });
 }
+
+export function peluqueriaCreate(data) {
+  return request({
+    url: '/peluqueria/create/' + data,
+    method: 'post',
+    data,
+  });
+}

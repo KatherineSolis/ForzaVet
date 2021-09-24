@@ -1,13 +1,13 @@
 <template>
   <div class="app-container">
-    <el-form v-if="user" :model="user">
+    <el-form v-if="user">
       <el-row :gutter="20">
         <el-col :span="6">
           <user-card :user="user" />
           <!-- <user-bio /> -->
         </el-col>
         <el-col :span="18">
-          <user-activity :user="user" />
+          <user-activity :user="user" :historial="historial" :vaccine="vaccine" :antiparasitic="antiparasitic" :peluqueria="peluqueria" />
         </el-col>
       </el-row>
     </el-form>
@@ -28,6 +28,10 @@ export default {
   data() {
     return {
       user: {},
+      historial: [],
+      vaccine: [],
+      antiparasitic: [],
+      peluqueria: [],
     };
   },
   watch: {
@@ -36,22 +40,23 @@ export default {
   created() {
     const id = this.$route.params && this.$route.params.id;
     const currentUserId = this.$store.getters.userId;
-    console.log(id);
-    console.log(currentUserId);
     if (id === currentUserId) {
       // this.$router.push('/profile/edit');
-      console.log('en el if');
+      // console.log('en el if');
       return;
     }
     this.getUser(id);
   },
   methods: {
     async getUser(id) {
-      console.log('en la funcion ' + id);
       const { data } = await getPet(id);
       this.user = data.items[0];
-      // console.log(data);
-      console.log(this.user);
+      this.historial = data.historial;
+      this.vaccine = data.vaccine;
+      this.antiparasitic = data.antiparasitic;
+      this.peluqueria = data.peluqueria;
+      console.log(this.historial);
+      // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
     },
   },
 };

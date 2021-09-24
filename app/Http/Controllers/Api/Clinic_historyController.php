@@ -9,6 +9,11 @@ use App\Laravue\Models\Antiparasitic_history;
 use App\Laravue\Models\Vaccines_history;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use App\Laravue\Models\Client;
+use App\Laravue\Models\Personal;
+use App\Laravue\Models\Pet;
+use Illuminate\Support\Facades\Mail;
+
 
 class Clinic_historyController extends Controller
 {
@@ -42,6 +47,24 @@ class Clinic_historyController extends Controller
     public function store(Request $request)
     {
         //
+        if ($request->type) {
+            $veterinario = Personal::find($request->personal_id);
+            $veterinario = $veterinario->first_name . ' ' . $veterinario->last_name;
+            $mascota = Pet::find($request->pet_id)->name;
+
+            $cliente = Client::find($request->client_id);
+            $details = [
+                'name_client' => $cliente->first_name . ' ' . $cliente->last_name,
+                'fecha' => $request->date,
+                'veterinario' => $veterinario,
+                'paciente' => $mascota,
+                'motivo' => $request->reason,
+                'diagnostico' => $request->diagnostic,
+                'tratamiento' => $request->treatment,
+                'receta' => $request->prescription,
+            ];
+            Mail::to($cliente->email)->send(new \App\Mail\NotificationPrescription($details));
+        }
         $historial = new Clinic_history([
             'date' => $request->date,
             'personal_id' => $request->personal_id,
@@ -154,13 +177,83 @@ class Clinic_historyController extends Controller
         $searchParams = $request->all();
         $reason = Arr::get($searchParams, 'reason', '');
 
-        $historial = Clinic_history::where('status', '=', '1')
-            //->OrWhere("reason", "in", "('Baño', 'Corte', 'Limpieza dental', 'Baño Medicado', 'Baño y corte', 'Baño medicado y corte')")
+        $historial = Clinic_history::select(
+            'clinic_histories.id',
+            'clinic_histories.date',
+            'clinic_histories.reason',
+            'clinic_histories.client_id',
+            'clinic_histories.pet_id',
+            'clinic_histories.personal_id',
+            'clinic_histories.diagnostic',
+            'pets.name',
+            Clinic_history::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+            'clients.email as email_cliente',
+            'pets.weight',
+            'clinic_histories.status',
+        )
+            ->join('pets', 'pets.id', '=', 'clinic_histories.pet_id')
+            ->join('clients', 'clients.id', '=', 'clinic_histories.client_id')
+            ->where('clinic_histories.status', '=', '1')
+            ->whereIn("clinic_histories.reason", ['Baño', 'Corte', 'Limpieza dental', 'Baño Medicado', 'Baño y corte', 'Baño medicado y corte'])
             ->get()->toArray();
 
         if (!empty($reason)) {
-            $historial = Clinic_history::where('reason', 'LIKE', '%' . $request->reason . '%')->get()->toArray();
+            $historial = Clinic_history::select(
+                'clinic_histories.id',
+                'clinic_histories.date',
+                'clinic_histories.reason',
+                'clinic_histories.client_id',
+                'clinic_histories.pet_id',
+                'clinic_histories.personal_id',
+                'clinic_histories.diagnostic',
+                'pets.name',
+                Clinic_history::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+                'clients.email as email_cliente',
+                'pets.weight',
+                'clinic_histories.status',
+            )
+                ->join('pets', 'pets.id', '=', 'clinic_histories.pet_id')
+                ->join('clients', 'clients.id', '=', 'clinic_histories.client_id')
+                ->where('clinic_histories.status', '=', '1')
+                ->where('reason', 'LIKE', '%' . $request->reason . '%')
+               
+                ->whereIn("reason", ['Baño', 'Corte', 'Limpieza dental', 'Baño Medicado', 'Baño y corte', 'Baño medicado y corte'])
+                ->get()->toArray();
         }
         return response()->json(new JsonResponse(['items' => $historial, 'total' => count($historial)]));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function peluqueriaCreate(Request $request, $id)
+    {
+        //
+        $pet = Pet::select(
+            'pets.id as pet_id',
+            'pets.name AS nombre_mascota',
+            'pets.age',
+            'pets.sex',
+            'pets.weight',
+            'pets.color',
+            'pets.chip',
+            'pets.client_id',
+            PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+            'clients.email as email_cliente',
+            'pets.specie',
+            'pets.breed',
+            'pets.castrated',
+            'pets.aggressiveness',
+            'pets.status',
+        )
+            ->join('clients', 'clients.id', '=', 'pets.client_id')
+            ->where('pets.id', $id)
+            ->get();
+
+        return response()->json(new JsonResponse(['items' => $pet]));
     }
 }

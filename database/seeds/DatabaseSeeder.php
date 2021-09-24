@@ -1,9 +1,5 @@
 <?php
 
-use App\Laravue\Models\Animal;
-use App\Laravue\Models\Specie;
-use App\Laravue\Models\Breed;
-use App\Laravue\Models\Client;
 use App\Laravue\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -19,85 +15,33 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@laravue.dev',
-            'password' => Hash::make('laravue'),
-        ]);
-        $manager = User::create([
-            'name' => 'Manager',
-            'email' => 'manager@laravue.dev',
-            'password' => Hash::make('laravue'),
-        ]);
-        $editor = User::create([
-            'name' => 'Editor',
-            'email' => 'editor@laravue.dev',
-            'password' => Hash::make('laravue'),
-        ]);
-        $user = User::create([
-            'name' => 'User',
-            'email' => 'user@laravue.dev',
-            'password' => Hash::make('laravue'),
-        ]);
-        $visitor = User::create([
-            'name' => 'Visitor',
-            'email' => 'visitor@laravue.dev',
-            'password' => Hash::make('laravue'),
+            'name' => 'Carlos Suarez Vargas',
+            'email' => 'carlos.suarezv@outlook.com',
+            'password' => Hash::make('laravue@2021'),
         ]);
 
-        //
-        Breed::create([
-            'name' => 'Dalmata',
+        $veterinario1 = User::create([
+            'name' => 'Erika Gonzales',
+            'email' => 'erika90_gzl@gmail.com',
+            'password' => Hash::make('eg_2021!G90'),
         ]);
-
-        Breed::create([
-            'name' => 'Boxer',
+        $veterinario2 = User::create([
+            'name' => 'Bianca Alvear ',
+            'email' => 'bianca.alvear98@hotmail.com',
+            'password' => Hash::make('webrtc_bls'),
         ]);
-
-        Animal::create([
-            'name' => 'Perro Cripto',
-            'breed_id' => 1,
-            'observation' => 'Es un perrito chevere',
-        ]);
-
-        Animal::create([
-            'name' => 'Perro ',
-            'breed_id' => 1,
-            'observation' => 'Es un perrito no tan chevere',
-        ]);
-
-        Animal::create([
-            'name' => 'Perro Traviezo',
-            'breed_id' => 1,
-            'observation' => 'Es un perrito malo',
-            'status' => 0
-        ]);
-
-        Client::create([
-            'first_name' => 'Super',
-            'last_name' => 'Man',
-            'document_type' => '**',
-            'document_number' => '001',
-            'phone' => '00123',
-            'direction' => '001',
-            'email' => '001',
-            'status' => '001',
-        ]);
-
-        Specie::create([
-            'name' => 'gato',
-            'status' => 1,
+        $veterinario3 = User::create([
+            'name' => 'Bryan Tejada',
+            'email' => 'btejada97@outlook.com',
+            'password' => Hash::make('btejada_97'),
         ]);
 
         $adminRole = Role::findByName(\App\Laravue\Acl::ROLE_ADMIN);
-        $managerRole = Role::findByName(\App\Laravue\Acl::ROLE_MANAGER);
-        $editorRole = Role::findByName(\App\Laravue\Acl::ROLE_EDITOR);
-        $userRole = Role::findByName(\App\Laravue\Acl::ROLE_USER);
-        $visitorRole = Role::findByName(\App\Laravue\Acl::ROLE_VISITOR);
+        $veterinarioRole = Role::findByName(\App\Laravue\Acl::ROLE_VETERINARY);
         $admin->syncRoles($adminRole);
-        $manager->syncRoles($managerRole);
-        $editor->syncRoles($editorRole);
-        $user->syncRoles($userRole);
-        $visitor->syncRoles($visitorRole);
-        $this->call(UsersTableSeeder::class);
+        $veterinario1->syncRoles($veterinarioRole);
+        $veterinario2->syncRoles($veterinarioRole);
+        $veterinario3->syncRoles($veterinarioRole);
+        //$this->call(UsersTableSeeder::class);
     }
 }

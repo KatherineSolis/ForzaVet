@@ -41,18 +41,17 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="Actions" width="350">
+      <el-table-column align="center" label="Acciones" width="350">
         <template slot-scope="scope">
-          <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id">
-            <el-button v-permission="['manage user']" type="primary" size="small" icon="el-icon-edit">
-              Edit
-            </el-button>
-          </router-link>
-          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
+          <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id" />
+          <!--el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
             Permissions
-          </el-button>
+          </el-button-->
           <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Delete
+          </el-button>
+          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id);">
+            editar
           </el-button>
         </template>
       </el-table-column>
@@ -90,11 +89,11 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="'Create new user'" :visible.sync="dialogFormVisible">
+    <el-dialog :title="'Crear usuario'" :visible.sync="dialogFormVisible" style="min-width:100vh;">
       <div v-loading="userCreating" class="form-container">
-        <el-form ref="userForm" :rules="rules" :model="newUser" label-position="left" label-width="150px" style="max-width: 500px;">
+        <el-form ref="userForm" :rules="rules" :model="newUser" style="padding:0px 30px;">
           <el-form-item :label="$t('user.role')" prop="role">
-            <el-select v-model="newUser.role" class="filter-item" placeholder="Please select role">
+            <el-select v-model="newUser.role" class="filter-item" placeholder="Please select role" style="width:100%;">
               <el-option v-for="item in nonAdminRoles" :key="item" :label="item | uppercaseFirst" :value="item" />
             </el-select>
           </el-form-item>
@@ -116,6 +115,33 @@
             {{ $t('table.cancel') }}
           </el-button>
           <el-button type="primary" @click="createUser()">
+            {{ $t('table.confirm') }}
+          </el-button>
+        </div>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="'Actualizar usuario'" :visible.sync="dialogFormVisible1" style="min-width:100vh;">
+      <div v-loading="userEditing" class="form-container">
+        <el-form ref="userForm1" :model="user" style="padding:0px 30px;">
+          <el-form-item label="Nombre usuario" prop="name">
+            <el-input v-model="user.name" />
+          </el-form-item>
+          <el-form-item label="Correo" prop="email">
+            <el-input v-model="user.email" />
+          </el-form-item>
+          <!--el-form-item label="Contraseña" prop="password">
+            <el-input v-model="user.password" show-password />
+          </el-form-item>
+          <el-form-item label="Confirmar contraseña" prop="confirmPassword">
+            <el-input v-model="user.confirmPassword" show-password />
+          </el-form-item-->
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible1 = false">
+            {{ $t('table.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="updateUser()">
             {{ $t('table.confirm') }}
           </el-button>
         </div>
@@ -153,6 +179,8 @@ export default {
       loading: true,
       downloading: false,
       userCreating: false,
+      dialogFormVisible1: false,
+      user: {},
       query: {
         page: 1,
         limit: 15,
@@ -160,7 +188,7 @@ export default {
         role: '',
       },
       roles: ['admin', 'manager', 'editor', 'user', 'visitor'],
-      nonAdminRoles: ['editor', 'user', 'visitor'],
+      nonAdminRoles: ['admin', 'veterinary'],
       newUser: {},
       dialogFormVisible: false,
       dialogPermissionVisible: false,
@@ -367,7 +395,7 @@ export default {
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'user',
+        role: 'veterinary',
       };
     },
     handleDownload() {
@@ -428,6 +456,31 @@ export default {
         this.dialogPermissionLoading = false;
         this.dialogPermissionVisible = false;
       });
+    },
+    async handleUpdate(id) {
+      const { data } = await userResource.get(id);
+      this.user = data;
+      this.dialogFormVisible1 = true;
+      this.$nextTick(() => {
+        this.$refs['userForm1'].clearValidate();
+      });
+    },
+    updateUser(){
+      userResource
+        .update(this.user.id, this.user)
+        .then(response => {
+          this.dialogFormVisible1 = false;
+          this.$message({
+            message: 'Se actualizo correctamente',
+            type: 'success',
+            duration: 5 * 1000,
+          });
+          this.$router.go(0);
+        })
+        .catch(error => {
+          console.log(error);
+          this.dialogFormVisible1 = false;
+        });
     },
   },
 };

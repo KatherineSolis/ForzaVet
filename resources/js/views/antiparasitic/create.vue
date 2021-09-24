@@ -3,11 +3,13 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+          <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
             <i class="el-icon-back" />
           </router-link>
           <span>Nueva estética</span>
-
+          <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="myFunction"><!----><i class="el-icon-check" /><span>
+            Guardar
+          </span></button>
         </div>
 
         <div style="padding:25px 50px 0px 20px;">
@@ -18,7 +20,7 @@
               <el-select v-model="form.client_id" placeholder="Seleccione Cliente..." style="width: 100%;" disabled @input="getListPet">
                 <el-option
                   v-for="(item, index) in optionsClient"
-                  :key="'a'+ index"
+                  :key="'aa'+ index"
                   :label="item.label"
                   :value="item.value"
                 />
@@ -28,18 +30,18 @@
               <el-select v-model="form.pet_id" placeholder="Seleccione mascota..." style="width: 100%;" disabled>
                 <el-option
                   v-for="(item, index) in optionsPet"
-                  :key="'b'+ index"
+                  :key="'ba'+ index"
                   :label="item.label"
                   :value="item.value"
                 />
               </el-select>
             </el-form-item>
 
-            <el-form-item label="Tipo" prop="reason">
-              <el-select v-model="form.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+            <el-form-item label="Tipo" prop="antiparasitic_id">
+              <el-select v-model="form.antiparasitic_id" placeholder="Seleccione tipo..." style="width: 100%;">
                 <el-option
-                  v-for="(item, index) in options"
-                  :key="'c'+index"
+                  v-for="(item, index) in optionsAntiparasitic"
+                  :key="'ca'+index"
                   :label="item.label"
                   :value="item.value"
                 />
@@ -47,7 +49,7 @@
             </el-form-item>
 
             <el-form-item label="Detalles">
-              <el-input v-model="form.diagnostic" type="textarea" style="width: 100%;" />
+              <el-input v-model="form.antiparasitic_observation" type="textarea" style="width: 100%;" />
             </el-form-item>
 
             <el-form-item>
@@ -66,7 +68,7 @@
 </template>
 
 <script>
-import { ListClient, fetchListPet, ListVaccine } from '@/api/appointment';
+import { ListClient, fetchListPet, ListAntiparasitic } from '@/api/appointment';
 import { fetchList, createHistory, peluqueriaCreate } from '@/api/clinic_history';
 export default {
   data() {
@@ -75,36 +77,11 @@ export default {
       list: null,
       optionsClient: [],
       optionsPet: [],
-      optionsVaccine: [],
-      options: [
-        {
-          value: 'Baño',
-          label: 'Baño',
-        },
-        {
-          value: 'Corte',
-          label: 'Corte',
-        },
-        {
-          value: 'Limpieza dental',
-          label: 'Limpieza dental',
-        },
-        {
-          value: 'Baño Medicado',
-          label: 'Baño medicado',
-        },
-        {
-          value: 'Baño y corte',
-          label: 'Baño y corte',
-        },
-        {
-          value: 'Baño medicado y corte',
-          label: 'Baño medicado y corte',
-        }],
+      optionsAntiparasitic: [],
       rules: {
         client_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
         pet_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
-        reason: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+        antiparasitic_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
       },
       form: {
         date: '',
@@ -114,7 +91,9 @@ export default {
         reason: '',
         anamnesis: '',
         vaccine_id: '',
+        vaccine_observation: '',
         antiparasitic_id: '',
+        antiparasitic_observation: '',
         diagnostic: '',
         pathology: '',
         treatment: '',
@@ -128,7 +107,7 @@ export default {
     this.getListClient();
     this.getListPet();
     this.getPeluqueria(id);
-    this.getListVaccine();
+    this.getListAntiparasitic();
   },
   methods: {
     onCancel() {
@@ -168,16 +147,16 @@ export default {
       this.listLoading = false;
       // console.log('pet', this.optionsPet);
     },
-    async getListVaccine() {
+    async getListAntiparasitic() {
       this.listLoading = true;
-      const { data } = await ListVaccine();
+      const { data } = await ListAntiparasitic();
 
-      for (const i in data.items) {
-        this.optionsVaccine.push({ value: data.items[i].id, label: data.items[i].name_vaccines });
+      for (var i in data.items) {
+        this.optionsAntiparasitic.push({ value: data.items[i].id, label: data.items[i].name_antiparasitic });
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      // console.log('cliente', this.optionsVaccine);
+      // console.log('desparacitante', this.optionsAntiparasitic);
     },
 
     myFunction() {
@@ -205,6 +184,7 @@ export default {
           this.form.id = this.list[this.list.length - 1].id + 1;
           this.form.status = 1;
           this.form.date = fechaHora;
+          this.form.reason = 'Desparasitación';
           createHistory(this.form).then((response) => {
             this.list.push(this.form);
             this.$notify({

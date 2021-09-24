@@ -170,13 +170,13 @@
                 <el-date-picker v-model="temp.expiry_date" type="date" placeholder="Pick a date" style="width: 100%;" />
               </el-col>
             </el-form-item>
-            <el-form-item label="Imagen" prop="image">
+            <!--el-form-item label="Imagen" prop="image">
               <el-image
                 style="width: 100px; height: 100px"
                 :src="temp.image"
                 :fit="fit"
               />
-            </el-form-item>
+            </el-form-item-->
             <el-form-item label="Imagen" prop="image">
               <el-input v-model="temp.image" type="file" />
             </el-form-item>
@@ -264,7 +264,7 @@ export default {
   data() {
     return {
       tableKey: 0,
-
+      table1Key: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -283,7 +283,7 @@ export default {
       dialogStatus: '',
       total: 0,
       textMap: {
-        update: 'Edit',
+        update: 'Editar',
         create: 'Crear',
         datos_mascotas: 'Lista Mascota',
       },
@@ -334,7 +334,6 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('datos_productos', data.items);
     },
     sortChange(data) {
       const { prop, order } = data;

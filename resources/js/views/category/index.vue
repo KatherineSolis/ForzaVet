@@ -3,7 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Animales</span>
+          <span>Categoria</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -170,7 +170,6 @@ export default {
 
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('dataaa', data.items);
     },
     sortChange(data) {
       const { prop, order } = data;

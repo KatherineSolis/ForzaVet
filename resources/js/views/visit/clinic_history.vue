@@ -12,7 +12,7 @@
               <el-date-picker v-model="form.dateTime" type="datetime" placeholder="ingrese fecha" />
             </el-form-item>
             <el-form-item label="Veterinario" prop="personal_id">
-              <el-select v-model="form.personal_id" placeholder="Seleccione Veterinario..." style="width: 100%;" disabled>
+              <el-select v-model="form.personal_id" placeholder="Seleccione Veterinario..." style="width: 100%;">
                 <el-option
                   v-for="item in optionsPersonal"
                   :key="item.value"
@@ -151,7 +151,7 @@
 </template>
 
 <script>
-import { ListPersonal, ListClient, fetchListPet, ListVaccine, ListAntiparasitic, getAppointment } from '@/api/appointment';
+import { ListPersonal, ListClient, fetchListPet, ListVaccine, ListAntiparasitic, getClinic } from '@/api/appointment';
 import { fetchList, createHistory } from '@/api/clinic_history';
 export default {
   data() {
@@ -220,7 +220,9 @@ export default {
           // console.log(`${formatFecha[0]}-${formatFecha[1]}-${formatFecha[2]} ${fechaHora[1]}`);
           this.form.id = this.list[this.list.length - 1].id + 1;
           this.form.status = 1;
-          this.form.date = this.form.dateTime;
+          const fechaHora = this.form.dateTime.toLocaleString().split(' ');
+          const formatFecha = (fechaHora[0]).split('/');
+          this.form.date = `${formatFecha[2]}-${formatFecha[1]}-${formatFecha[0]} ${fechaHora[1]}`;
           createHistory(this.form).then((response) => {
             this.list.push(this.form);
             this.$notify({
@@ -296,7 +298,7 @@ export default {
       this.listLoading = true;
       const { data } = await ListPersonal();
 
-      for (var i in data.items) {
+      for (const i in data.items) {
         this.optionsPersonal.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
       }
       // Just to simulate the time of the request
@@ -307,7 +309,7 @@ export default {
       this.listLoading = true;
       const { data } = await ListClient();
 
-      for (var i in data.items) {
+      for (const i in data.items) {
         this.optionsClient.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
       }
       // Just to simulate the time of the request
@@ -318,7 +320,7 @@ export default {
       this.listLoading = true;
       const { data } = await fetchListPet();
       this.optionsPet = [];
-      for (var i in data.items) {
+      for (const i in data.items) {
         this.optionsPet.push({ value: data.items[i].id, label: data.items[i].name });
       }
       // Just to simulate the time of the request
@@ -329,7 +331,7 @@ export default {
       this.listLoading = true;
       const { data } = await ListVaccine();
 
-      for (var i in data.items) {
+      for (const i in data.items) {
         this.optionsVaccine.push({ value: data.items[i].id, label: data.items[i].name_vaccines });
       }
       // Just to simulate the time of the request
@@ -340,7 +342,7 @@ export default {
       this.listLoading = true;
       const { data } = await ListAntiparasitic();
 
-      for (var i in data.items) {
+      for (const i in data.items) {
         this.optionsAntiparasitic.push({ value: data.items[i].id, label: data.items[i].name_antiparasitic });
       }
       // Just to simulate the time of the request
@@ -348,9 +350,9 @@ export default {
       // console.log('desparacitante', this.optionsAntiparasitic);
     },
     async getAppointment(id) {
-      const { data } = await getAppointment(id);
-      this.form = data.items[0];
-      this.form.reason = this.form.description;
+      const { data } = await getClinic(id);
+      this.form.client_id = data.items[0].client_id;
+      this.form.pet_id = data.items[0].pet_id;
       // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
     },
 

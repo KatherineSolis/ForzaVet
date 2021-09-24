@@ -3,11 +3,13 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+          <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
             <i class="el-icon-back" />
           </router-link>
           <span>Nueva estética</span>
-
+          <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="myFunction"><!----><i class="el-icon-check" /><span>
+            Guardar
+          </span></button>
         </div>
 
         <div style="padding:25px 50px 0px 20px;">
@@ -18,7 +20,7 @@
               <el-select v-model="form.client_id" placeholder="Seleccione Cliente..." style="width: 100%;" disabled @input="getListPet">
                 <el-option
                   v-for="(item, index) in optionsClient"
-                  :key="'a'+ index"
+                  :key="'al'+ index"
                   :label="item.label"
                   :value="item.value"
                 />
@@ -28,18 +30,18 @@
               <el-select v-model="form.pet_id" placeholder="Seleccione mascota..." style="width: 100%;" disabled>
                 <el-option
                   v-for="(item, index) in optionsPet"
-                  :key="'b'+ index"
+                  :key="'bl'+ index"
                   :label="item.label"
                   :value="item.value"
                 />
               </el-select>
             </el-form-item>
 
-            <el-form-item label="Tipo" prop="reason">
-              <el-select v-model="form.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+            <el-form-item label="Tipo Vacuna" prop="vaccine_id">
+              <el-select v-model="form.vaccine_id" placeholder="Seleccione tipo..." style="width: 100%;">
                 <el-option
-                  v-for="(item, index) in options"
-                  :key="'c'+index"
+                  v-for="(item, index) in optionsVaccine"
+                  :key="'cl'+index"
                   :label="item.label"
                   :value="item.value"
                 />
@@ -47,7 +49,7 @@
             </el-form-item>
 
             <el-form-item label="Detalles">
-              <el-input v-model="form.diagnostic" type="textarea" style="width: 100%;" />
+              <el-input v-model="form.vaccine_observation" type="textarea" style="width: 100%;" />
             </el-form-item>
 
             <el-form-item>
@@ -104,7 +106,7 @@ export default {
       rules: {
         client_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
         pet_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
-        reason: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+        vaccine_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
       },
       form: {
         date: '',
@@ -114,7 +116,9 @@ export default {
         reason: '',
         anamnesis: '',
         vaccine_id: '',
+        vaccine_observation: '',
         antiparasitic_id: '',
+        antiparasitic_observation: '',
         diagnostic: '',
         pathology: '',
         treatment: '',
@@ -205,6 +209,7 @@ export default {
           this.form.id = this.list[this.list.length - 1].id + 1;
           this.form.status = 1;
           this.form.date = fechaHora;
+          this.form.reason = 'Vacunación';
           createHistory(this.form).then((response) => {
             this.list.push(this.form);
             this.$notify({

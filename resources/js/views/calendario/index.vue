@@ -91,6 +91,10 @@ export default {
         title: [{ required: true, message: 'type is required', trigger: 'change' }],
         registration_date: [{ required: true, message: 'type is required', trigger: 'change' }],
         hours: [{ required: true, message: 'type is required', trigger: 'change' }],
+        client_id: [{ required: true, message: 'type is required', trigger: 'change' }],
+        pet_id: [{ required: true, message: 'type is required', trigger: 'change' }],
+        description: [{ required: true, message: 'type is required', trigger: 'change' }],
+        personal_id: [{ required: true, message: 'type is required', trigger: 'change' }],
       },
       temp: {
         id: undefined,
@@ -121,7 +125,7 @@ export default {
     agendamiento: function(){
 
     },
-    handleDateSelect(selectInfo) {
+    /* handleDateSelect(selectInfo) {
       const title = prompt('Please enter a new title for your event');
       const calendarApi = this.$refs.fullCalendar.getApi();
       calendarApi.remove(); // clear date selection
@@ -133,14 +137,12 @@ export default {
           allDay: selectInfo.allDay,
         });
       }
-      console.log('Fechas selecionada startInfo: ' + selectInfo.startStr);
-      console.log('Fechas selecionada: ' + selectInfo.endStr);
-    },
-    handleEventClick(clickInfo) {
+    },*/
+    /* handleEventClick(clickInfo) {
       if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
         clickInfo.event.remove();
       }
-    },
+    },*/
     handleEvents(events) {
       this.currentEvents = events;
     }, // metodo de listar agendamiento de citas
@@ -160,8 +162,6 @@ export default {
           // new Date(fecha[0], fecha[1], fecha[2], hora[0], hora[1], hora[2]);
           const fechaAgenda = `${fecha[0]}-${fecha[1]}-${fecha[2]}T${hora[0]}:${hora[1]}:${hora[2]}-05:00`;
           const fechaAgenda1 = `${fecha[0]}-${fecha[1]}-${fecha[2]}T${hora[0]}:30:${hora[2]}-05:00`;
-          console.log(fechaAgenda);
-          console.log(fechaAgenda1);
           calendarApi.addEvent({
             title: value.description,
             start: fechaAgenda,
@@ -180,7 +180,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('medicos', this.optionsPersonal);
+      // console.log('medicos', this.optionsPersonal);
     },
     async getListClient() {
       this.listLoading = true;
@@ -191,7 +191,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('cliente', this.optionsClient);
+      // console.log('cliente', this.optionsClient);
     },
     async getListPet() {
       this.listLoading = true;
@@ -202,7 +202,7 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      console.log('pet', this.optionsPet);
+      // console.log('pet', this.optionsPet);
     },
     resetTemp() {
       this.temp = {
@@ -231,11 +231,11 @@ export default {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
           this.temp.hours = splitHoras.hours.toLocaleTimeString();
-          this.temp.registration_date = `${arrayHoras[2]}-${arrayHoras[1]}-${arrayHoras[0]}`;
+          this.temp.registration_date = `${arrayHoras[2]}-0${arrayHoras[1]}-${arrayHoras[0]}`;
           createCita(this.temp).then((response) => {
-            this.getList();
             this.dialogFormVisible = false;
-
+            this.$router.go(0);
+            this.getList();
             this.$message({
               message: 'Se agendo la cita' + this.temp.description + '(' + this.temp.registration_date + ' ' + this.temp.hours + ') correctamento.',
               type: 'success',
@@ -295,7 +295,7 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Fecha/Hora de cita" style="width: 100%;">
+            <el-form-item label="Fecha/Hora de cita" style="width: 100%;" prop="registration_date">
               <el-col :span="11">
                 <el-date-picker v-model="temp.registration_date" type="date" placeholder="Seleccione Fecha" style="width: 100%;" />
               </el-col>

@@ -1,9 +1,10 @@
 import request from '@/utils/request';
 
-export function fetchList() {
+export function fetchList(query) {
   return request({
     url: '/citas',
     method: 'get',
+    params: query,
   });
 }
 
@@ -55,6 +56,29 @@ export function ListVaccine() {
 export function ListAntiparasitic() {
   return request({
     url: '/cita/antiparasitic',
+    method: 'get',
+  });
+}
+
+export function getAppointment(data) {
+  return request({
+    url: '/cita/consultar/' + data,
+    method: 'post',
+    data,
+  });
+}
+
+export function getClinic(data) {
+  return request({
+    url: '/cita/history/' + data,
+    method: 'post',
+    data,
+  });
+}
+
+export function fetchListPet() {
+  return request({
+    url: '/cita/list/pet',
     method: 'get',
   });
 }

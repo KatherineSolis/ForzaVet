@@ -8,7 +8,7 @@ const adminRoutes = {
   name: 'Administrator',
   alwaysShow: true,
   meta: {
-    title: 'Administración',
+    title: 'Administrar',
     icon: 'admin',
     permissions: ['view menu administrator'],
   },
@@ -20,13 +20,6 @@ const adminRoutes = {
                 import ('@/views/medicos/index'),
       name: 'MedicosList',
       meta: { title: 'Medicos', icon: 'peoples' },
-    },
-    {
-      path: 'mascotas',
-      component: () =>
-                import ('@/views/species/index'),
-      name: 'Mascotas',
-      meta: { title: 'tipo Mascotas', icon: 'role' },
     },
     {
       path: 'users/edit/:id(\\d+)',
@@ -41,8 +34,21 @@ const adminRoutes = {
       component: () =>
                 import ('@/views/users/List'),
       name: 'UserList',
-      meta: { title: 'users', icon: 'user', permissions: ['manage user'] },
+      meta: { title: 'Usuarios', icon: 'user', permissions: ['manage user'] },
     },
+    /* {
+            path: 'users',
+            component: () =>
+                import ('@/views/users/user'),
+            name: 'UserList',
+            meta: { title: 'users', icon: 'user' },
+        },*/
+    /* {
+            path: 'roles',
+            component: () =>
+                import ('@/views/role-permission/role'),
+            meta: { title: 'Roles y Permisos', icon: 'role' },
+        },*/
     /** Role and permission */
     {
       path: 'roles',
@@ -51,43 +57,43 @@ const adminRoutes = {
       name: 'RoleList',
       meta: { title: 'Roles y Permisos', icon: 'role', permissions: ['manage permission'] },
     },
-    {
-      path: 'animals',
-      component: () =>
-                import ('@/views/animal/Index'),
-      name: 'AnimalList',
-      meta: { title: 'Animales', icon: 'role' },
-    },
     /* {
-            path: 'clients',
-            component: () =>
-                import ('@/views/client/Index'),
-            name: 'ClientList',
-            meta: { title: 'Clientes', icon: 'role' },
+          path: 'animals',
+          component: () =>
+                    import ('@/views/animal/Index'),
+          name: 'AnimalList',
+          meta: { title: 'Animales', icon: 'role' },
         },*/
     /* {
-                path: 'articles/create',
+                path: 'clients',
                 component: () =>
-                    import ('@/views/articles/Create'),
-                name: 'CreateArticle',
-                meta: { title: 'createArticle', icon: 'edit', permissions: ['manage article'] },
-                hidden: true,
-            },
-            {
-                path: 'articles/edit/:id(\\d+)',
-                component: () =>
-                    import ('@/views/articles/Edit'),
-                name: 'EditArticle',
-                meta: { title: 'editArticle', noCache: true, permissions: ['manage article'] },
-                hidden: true,
-            },
-            {
-                path: 'articles',
-                component: () =>
-                    import ('@/views/articles/List'),
-                name: 'ArticleList',
-                meta: { title: 'articleList', icon: 'list', permissions: ['manage article'] },
+                    import ('@/views/client/Index'),
+                name: 'ClientList',
+                meta: { title: 'Clientes', icon: 'role' },
             },*/
+    /* {
+                    path: 'articles/create',
+                    component: () =>
+                        import ('@/views/articles/Create'),
+                    name: 'CreateArticle',
+                    meta: { title: 'createArticle', icon: 'edit', permissions: ['manage article'] },
+                    hidden: true,
+                },
+                {
+                    path: 'articles/edit/:id(\\d+)',
+                    component: () =>
+                        import ('@/views/articles/Edit'),
+                    name: 'EditArticle',
+                    meta: { title: 'editArticle', noCache: true, permissions: ['manage article'] },
+                    hidden: true,
+                },
+                {
+                    path: 'articles',
+                    component: () =>
+                        import ('@/views/articles/List'),
+                    name: 'ArticleList',
+                    meta: { title: 'articleList', icon: 'list', permissions: ['manage article'] },
+                },*/
   ],
 };
 

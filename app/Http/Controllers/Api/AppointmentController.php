@@ -11,8 +11,11 @@ use App\Laravue\Models\Client;
 use App\Laravue\Models\Pet;
 use App\Laravue\Models\Vaccine;
 use App\Laravue\Models\Antiparasitic;
+use App\Laravue\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
 {
@@ -21,10 +24,54 @@ class AppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $citas = Appointment::all()->toArray();
+        $searchParams = $request->all();
+        $name = Arr::get($searchParams, 'name', '');
+
+        $citas = Appointment::select(
+            'appointments.id',
+            'appointments.description',
+            'appointments.registration_date',
+            'appointments.hours',
+            Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
+            'appointments.personal_id',
+            PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
+            'appointments.client_id',
+            PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+            'pets.name',
+            'appointments.pet_id',
+            'appointments.status',
+        )
+            ->join('pets', 'pets.id', '=', 'appointments.pet_id')
+            ->join('personals', 'personals.id', '=', 'appointments.personal_id')
+            ->join('clients', 'clients.id', '=', 'appointments.client_id')
+            ->where('appointments.status', '1')
+            ->orderby('appointments.registration_date', 'desc')->get()->toArray();
+
+        if (!empty($name)) {
+            $citas = Appointment::select(
+                'appointments.id',
+                'appointments.description',
+                'appointments.registration_date',
+                'appointments.hours',
+                Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
+                'appointments.personal_id',
+                PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
+                'appointments.client_id',
+                PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+                'pets.name',
+                'appointments.pet_id',
+                'appointments.status',
+            )
+                ->join('pets', 'pets.id', '=', 'appointments.pet_id')
+                ->join('personals', 'personals.id', '=', 'appointments.personal_id')
+                ->join('clients', 'clients.id', '=', 'appointments.client_id')
+                ->where('appointments.status', '1')
+                ->where('appointments.description', 'LIKE', '%' . $name . '%')
+                ->OrWhere('pets.name', 'LIKE', '%' . $name . '%')
+                ->orderby('appointments.registration_date', 'desc')->get()->toArray();
+        }
         return response()->json(new JsonResponse(['items' => $citas, 'total' => count($citas)]));
     }
 
@@ -47,6 +94,13 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         //
+        $cliente = Client::find($request->client_id);
+        $details = [
+            'fecha_cita' => $request->registration_date,
+            'hora_cita' => $request->hours,
+            'name' => $cliente->first_name . ' ' . $cliente->last_name,
+        ];
+        Mail::to($cliente->email)->send(new \App\Mail\NotificationAppointment($details));
 
         $cita = new Appointment([
             'registration_date' => $request->registration_date,
@@ -125,7 +179,7 @@ class AppointmentController extends Controller
      */
     public function personal()
     {
-        $personals = Personal::all()->toArray();
+        $personals = Personal::where('status', '1')->get()->toArray();
         return response()->json(new JsonResponse(['items' => $personals]));
     }
 
@@ -147,6 +201,7 @@ class AppointmentController extends Controller
      */
     public function mascota(Request $request)
     {
+        //dd($request);
         $searchParams = $request->all();
         $cliente_id = Arr::get($searchParams, 'client_id', '');
         $pets = Pet::where('client_id', '=', $cliente_id)->get()->toArray();
@@ -172,5 +227,65 @@ class AppointmentController extends Controller
     {
         $antiparasitic = Antiparasitic::all()->toArray();
         return response()->json(new JsonResponse(['items' => $antiparasitic]));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function citaConsulta(Request $request, $id)
+    {
+        //
+        if ($id >= 1) {
+            $appointment = Appointment::select(
+                'appointments.pet_id',
+                'appointments.personal_id',
+                'appointments.client_id',
+                'appointments.status',
+                'appointments.description',
+                Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
+            )
+                ->join('clients', 'clients.id', '=', 'appointments.client_id')
+                ->join('pets', 'pets.id', '=', 'appointments.pet_id')
+                ->join('personals', 'personals.id', '=', 'appointments.personal_id')
+                ->where('appointments.id', $id)
+                ->get();
+        }
+
+        return response()->json(new JsonResponse(['items' => $appointment]));
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function todasMascota()
+    {
+        $pets = Pet::where('status', '1')->get()->toArray();
+        return response()->json(new JsonResponse(['items' => $pets]));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function clinicConsulta(Request $request, $id)
+    {
+        //
+        if ($id >= 1) {
+            $appointment = Pet::select(
+                'pets.id as pet_id',
+                'pets.client_id',
+                'pets.status',
+            )->where('pets.id', $id)->get();
+        }
+
+        return response()->json(new JsonResponse(['items' => $appointment]));
     }
 }

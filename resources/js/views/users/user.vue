@@ -3,16 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Lista de veterinarios</span>
-          <el-button
-            class="filter-item"
-            style="float:right;"
-            type="primary"
-            icon="el-icon-plus"
-            @click="handleCreate"
-          >
-            {{ $t('table.add') }}
-          </el-button>
+          <span>Usuarios</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -33,13 +24,21 @@
             >
               {{ $t('table.search') }}
             </el-button>
-
+            <el-button
+              class="filter-item"
+              style="margin-left: 10px"
+              type="primary"
+              icon="el-icon-plus"
+              @click="handleCreate"
+            >
+              {{ $t('table.add') }}
+            </el-button>
           </div>
         </div>
         <el-table
           :key="tableKey"
           v-loading="listLoading"
-          :data="list"
+          :data="user"
           border
           fit
           highlight-current-row
@@ -47,44 +46,43 @@
           @sort-change="sortChange"
         >
           <el-table-column
-            label="Tipo"
-            prop="document_type"
+            :label="$t('table.id')"
+            prop="id"
             align="center"
-            width="150px"
+            width="80"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.document_type }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="Número"
-            prop="document_number"
-            align="center"
-            width="180px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.document_number }}</span>
+              <span>{{ scope.row.id }}</span>
             </template>
           </el-table-column>
           <el-table-column
             label="Nombre"
-            prop="name"
-            align="center"
-            min-width="180px"
-          >
-            <template slot-scope="scope">
-              <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
-            </template>
-          </el-table-column>
-
-          <el-table-column
-            label="Teléfono"
-            prop="phone"
+            prop="nombre"
             align="center"
             width="150px"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.phone }}</span>
+              <span>{{ scope.row.nombre }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Email"
+            prop="correo"
+            align="center"
+            min-width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.correo }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Rol"
+            prop="role"
+            align="center"
+            width="180px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.role }}</span>
             </template>
           </el-table-column>
           <el-table-column label="Estado" class-name="status-col" width="100">
@@ -101,25 +99,25 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
+          <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-              <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
+              <el-button type="primary" icon="el-icon-edit-outline" size="small" />
+              <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger">
                 Inactivar
               </el-button>
-              <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success" @click="handleModifyStatus(row, 1)">
+              <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success">
                 Activar
               </el-button>
             </template>
           </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" align="right" @pagination="getList" />
+        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:80vh;">
-          <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
-            <el-form-item label="Tipo:" prop="document_type">
-              <el-select v-model="temp.document_type" placeholder="Seleccionar" style="width:100%;">
+        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+          <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+            <el-form-item label="Tipo de documento" prop="document_type">
+              <el-select v-model="temp.document_type" placeholder="Seleccionar">
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -128,22 +126,22 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Número:" prop="document_number">
+            <el-form-item label="Numero Doc" prop="document_number">
               <el-input v-model="temp.document_number" />
             </el-form-item>
-            <el-form-item label="Nombre:" prop="first_name">
+            <el-form-item label="Nombres" prop="first_name">
               <el-input v-model="temp.first_name" />
             </el-form-item>
-            <el-form-item label="Apellido:" prop="last_name">
+            <el-form-item label="Apellidos" prop="last_name">
               <el-input v-model="temp.last_name" />
             </el-form-item>
-            <el-form-item label="Dirección:" prop="direction">
+            <el-form-item label="Direccion" prop="direction">
               <el-input v-model="temp.direction" />
             </el-form-item>
-            <el-form-item label="Correo:" prop="email">
+            <el-form-item label="Correo" prop="email">
               <el-input v-model="temp.email" />
             </el-form-item>
-            <el-form-item label="Teléfono:" prop="phone">
+            <el-form-item label="Telefono" prop="phone">
               <el-input v-model="temp.phone" />
             </el-form-item>
           </el-form>
@@ -156,13 +154,12 @@
             </el-button>
           </div>
         </el-dialog>
-
       </el-card>
     </el-row>
   </div>
 </template>
 <script>
-import { fetchList, createPersonal, updatePersonal } from '@/api/personal';
+// import { fetchList, createSupplier, updateSupplier } from '@/api/supplier';
 import waves from '@/directive/waves'; // Waves directive
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 
@@ -172,7 +169,7 @@ export default {
   data() {
     return {
       tableKey: 0,
-      total: 0,
+      table1Key: 0,
       listQuery: {
         page: 1,
         limit: 20,
@@ -183,12 +180,14 @@ export default {
       },
       listLoading: false,
       list: null,
+      listPets: null,
       showReviewer: false,
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
+        update: 'Editar',
         create: 'Crear',
+        datos_mascotas: 'Lista Mascota',
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -196,22 +195,58 @@ export default {
       },
       temp: {
         id: undefined,
-        name: '',
-        observation: '',
+        first_name: '',
+        last_name: '',
+        document_type: '',
+        document_number: '',
+        phone: '',
+        direction: '',
+        email: '',
       },
       options: [
         {
-          value: 'Cedula',
+          value: 'CI',
           label: 'Cedula',
         },
         {
-          value: 'Ruc',
-          label: 'Ruc',
+          value: 'Passport',
+          label: 'Pasaporte',
         }],
+
+      user: [
+        {
+          id: '1',
+          nombre: 'Carlos Suarez',
+          correo: 'carlos.suarezv@outlook.com',
+          role: 'admin',
+          status: '1',
+        },
+        {
+          id: '2',
+          correo: 'bliz@hotmail.es',
+          nombre: 'Bianca Alvear',
+          role: 'veterinary',
+          status: '1',
+        },
+        {
+          id: '3',
+          correo: 'erika.gonzales_19@outlook.com',
+          nombre: 'Erika Gonzales',
+          role: 'veterinary',
+          status: '1',
+        },
+        {
+          id: '4',
+          correo: 'bryantejada96@outlook.com',
+          nombre: 'Bryan Tejada',
+          role: 'veterinary',
+          status: '1',
+        }],
+      total: this.user,
     };
   },
   created() {
-    this.getList();
+
   },
   methods: {
     handleFilter() {
@@ -219,15 +254,6 @@ export default {
       this.getList();
     },
 
-    async getList() {
-      this.listLoading = true;
-      const { data } = await fetchList(this.listQuery);
-      this.list = data.items;
-      this.total = data.total;
-
-      // Just to simulate the time of the request
-      this.listLoading = false;
-    },
     sortChange(data) {
       const { prop, order } = data;
       if (prop === 'id') {
@@ -237,8 +263,13 @@ export default {
     resetTemp() {
       this.temp = {
         id: undefined,
-        name: '',
-        observation: '',
+        first_name: '',
+        last_name: '',
+        document_type: '',
+        document_number: '',
+        phone: '',
+        direction: '',
+        email: '',
       };
     },
     handleCreate() {
@@ -254,25 +285,25 @@ export default {
         if (valid) {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
-          createPersonal(this.temp).then((response) => {
-            this.list.push(this.temp);
-            this.dialogFormVisible = false;
+          // createSupplier(this.temp).then((response) => {
+          // this.list.push(this.temp);
+          this.dialogFormVisible = false;
 
-            this.$notify({
-              title: 'Success',
-              message: 'Created successfully',
-              type: 'success',
-              duration: 2000,
-            });
+          this.$notify({
+            title: 'Success',
+            message: 'Created successfully',
+            type: 'success',
+            duration: 2000,
+            // });
           });
         }
       });
     },
-    updateData() {
+    /* updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           console.log(this.temp);
-          updatePersonal(this.temp).then(() => {
+          updateSupplier(this.temp).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
                 const index = this.list.indexOf(v);
@@ -290,18 +321,18 @@ export default {
           });
         }
       });
-    },
-    async handleModifyStatus(row, status) {
+    },*/
+    /* async handleModifyStatus(row, status) {
       this.listLoading = true;
       row.status = status;
-      await updatePersonal(row);
+      await updateSupplier(row);
 
       this.$message({
         message: 'Successful operation',
         type: 'success',
       });
       this.listLoading = false;
-    },
+    },*/
 
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj

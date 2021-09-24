@@ -62,8 +62,8 @@ export default {
     };
     return {
       loginForm: {
-        email: 'Ingresa dirección de correo',
-        password: 'Password',
+        email: '',
+        password: '',
       },
       loginRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],

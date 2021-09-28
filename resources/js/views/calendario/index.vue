@@ -8,7 +8,13 @@ import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import waves from '@/directive/waves'; // Waves directive
 import interactionPlugin from '@fullcalendar/interaction';
-import { fetchList, createCita, ListPersonal, ListClient, ListPet } from '@/api/appointment';
+import {
+  fetchList,
+  createCita,
+  ListPersonal,
+  ListClient,
+  ListPet,
+} from '@/api/appointment';
 // import Pagination from '@/components/Pagination';
 // import { sliceEvents, createPlugin } from '@fullcalendar/core';
 
@@ -20,30 +26,52 @@ export default {
   directives: { waves },
   data() {
     var validateCita = (rule, value, callback) => {
-      let dateStringArray = this.temp.registration_date.toLocaleDateString().split('/');
-      let fechaVal = dateStringArray[2]+'-'+this.fechaMes(dateStringArray[1])+'-'+this.fechaMes(dateStringArray[0]);
+      let dateStringArray = this.temp.registration_date
+        .toLocaleDateString()
+        .split('/');
+      let fechaVal =
+        dateStringArray[2] +
+        '-' +
+        this.fechaMes(dateStringArray[1]) +
+        '-' +
+        this.fechaMes(dateStringArray[0]);
       let timeString = this.temp.hours.toLocaleTimeString();
       //let formatomes = this.fechaMes(dateStringArray[1]);
       //console.log('formato mes', formatomes);
       console.log('dateString', fechaVal);
       console.log('timeString', timeString);
 
-      
       console.log(value);
-      if (value >= 1 && fechaVal != '' && timeString != ''){
-          Object.entries(this.list).forEach(([key, valor]) => {
-              if (value == valor.personal_id && fechaVal == valor.registration_date && timeString == valor.hours ){
-                  console.log('No se puede registrar la cita', valor.registration_date);
-                  callback(new Error('Hola'));
-                  callback(new Error('No se puede registrar la cita'));
-              }else{
-                callback();
-              }
+      let valida = false;
+      if (value >= 1 && fechaVal != '' && timeString != '') {
+        Object.entries(this.list).forEach(([key, valor]) => {
+          if (
+            value == valor.personal_id &&
+            fechaVal == valor.registration_date &&
+            timeString == valor.hours
+          ) {
+            console.log(
+              'No se puede registrar la cita',
+              valor.registration_date
+            );
+
+            this.$notify({
+              title: 'No se puede registrar la cita',
+              message: 'Ya existe una cita con los mismos datos',
+              type: 'error',
+              duration: 3000,
             });
-      }else{
-        callback();
+            valida = true;
+          }
+        });
+      } else {
+        console.log('es valido');
       }
-      
+      if (valida) {
+        this.validacionCita = true;
+      } else {
+        this.validacionCita = false;
+      }
     };
     return {
       calendarOptions: {
@@ -92,7 +120,6 @@ export default {
         }, */
         timeZone: 'local',
         locale: 'es',
-
       },
       listLoading: false,
       listQuery: {
@@ -116,14 +143,28 @@ export default {
         create: 'Crear',
       },
       rules: {
-        title: [{ required: true, message: 'type is required', trigger: 'change' }],
-        registration_date: [{ required: true, message: 'type is required', trigger: 'change' }],
-        hours: [{ required: true, message: 'type is required', trigger: 'change' }],
-        client_id: [{ required: true, message: 'type is required', trigger: 'change' }],
-        pet_id: [{ required: true, message: 'type is required', trigger: 'change' }],
-        description: [{ required: true, message: 'type is required', trigger: 'change' }],
-        personal_id: [{ required: true, message: 'type is required', trigger: 'change' },
-        {validator: validateCita, trigger:['blur', 'change'] }],
+        title: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        registration_date: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        hours: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        client_id: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        pet_id: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        description: [
+          { required: true, message: 'type is required', trigger: 'change' },
+        ],
+        personal_id: [
+          { required: true, message: 'type is required', trigger: 'change' },
+          { validator: validateCita, trigger: ['blur', 'change'] },
+        ],
       },
       temp: {
         id: undefined,
@@ -134,6 +175,7 @@ export default {
         registration_date: '',
         hours: '',
       },
+      validacionCita: false,
     };
   },
   created() {
@@ -143,17 +185,15 @@ export default {
     // this.getListPet();
   },
   methods: {
-    handleDateClick: function(arg) {
+    handleDateClick: function (arg) {
       /* console.log(arg);
       console.log(arg.date);*/
       // alert('date click! ' + arg.dateStr);
     },
-    toggleWeekends: function() {
+    toggleWeekends: function () {
       this.calendarOptions.weekends = !this.calendarOptions.weekends; // toggle the boolean!
     },
-    agendamiento: function(){
-
-    },
+    agendamiento: function () {},
     /* handleDateSelect(selectInfo) {
       const title = prompt('Please enter a new title for your event');
       const calendarApi = this.$refs.fullCalendar.getApi();
@@ -205,7 +245,10 @@ export default {
       const { data } = await ListPersonal();
 
       for (var i in data.items) {
-        this.optionsPersonal.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
+        this.optionsPersonal.push({
+          value: data.items[i].id,
+          label: data.items[i].first_name + ' ' + data.items[i].last_name,
+        });
       }
       // Just to simulate the time of the request
       this.listLoading = false;
@@ -216,7 +259,10 @@ export default {
       const { data } = await ListClient();
 
       for (var i in data.items) {
-        this.optionsClient.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
+        this.optionsClient.push({
+          value: data.items[i].id,
+          label: data.items[i].first_name + ' ' + data.items[i].last_name,
+        });
       }
       // Just to simulate the time of the request
       this.listLoading = false;
@@ -227,7 +273,10 @@ export default {
       const { data } = await ListPet(this.temp);
       this.optionsPet = [];
       for (var i in data.items) {
-        this.optionsPet.push({ value: data.items[i].id, label: data.items[i].name });
+        this.optionsPet.push({
+          value: data.items[i].id,
+          label: data.items[i].name,
+        });
       }
       // Just to simulate the time of the request
       this.listLoading = false;
@@ -256,7 +305,9 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const splitHoras = this.temp;
-          const arrayHoras = splitHoras.registration_date.toLocaleDateString().split('/');
+          const arrayHoras = splitHoras.registration_date
+            .toLocaleDateString()
+            .split('/');
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
           this.temp.hours = splitHoras.hours.toLocaleTimeString();
@@ -266,7 +317,14 @@ export default {
             this.$router.go(0);
             this.getList();
             this.$message({
-              message: 'Se agendo la cita' + this.temp.description + '(' + this.temp.registration_date + ' ' + this.temp.hours + ') correctamento.',
+              message:
+                'Se agendo la cita' +
+                this.temp.description +
+                '(' +
+                this.temp.registration_date +
+                ' ' +
+                this.temp.hours +
+                ') correctamento.',
               type: 'success',
               duration: 5 * 1000,
             });
@@ -274,13 +332,13 @@ export default {
         }
       });
     },
-    fechaMes(mes){
-      if(mes <= 9 && mes >= 1){
-        return "0"+mes;
-      }else{
+    fechaMes(mes) {
+      if (mes <= 9 && mes >= 1) {
+        return '0' + mes;
+      } else {
         return mes;
       }
-    }
+    },
   },
 };
 </script>
@@ -292,25 +350,50 @@ export default {
           <span>Agendar Citas</span>
         </div>
         <!-- <el-button type="primary" icon="el-icon-plus" @click="toggleWeekends">todos los dias</el-button> -->
-        <el-button type="primary" icon="el-icon-plus" @click="handleCreate">Nueva Cita</el-button>
-        <br>
-        <br>
+        <el-button type="primary" icon="el-icon-plus" @click="handleCreate"
+          >Nueva Cita</el-button
+        >
+        <br />
+        <br />
         <FullCalendar ref="fullCalendar" :options="calendarOptions" />
-        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:100vh;">
-          <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
+        <el-dialog
+          :title="textMap[dialogStatus]"
+          :visible.sync="dialogFormVisible"
+          style="min-width: 100vh"
+        >
+          <el-form
+            ref="dataForm"
+            :rules="rules"
+            :model="temp"
+            style="padding: 0px 30px"
+          >
             <el-form-item label="Fecha/Hora de cita" prop="registration_date">
-              <el-col :span="11" style="width: 100%;">
-                <el-date-picker v-model="temp.registration_date" type="date" placeholder="Seleccione Fecha" style="width: 100%;"/>
+              <el-col :span="11" style="width: 100%">
+                <el-date-picker
+                  v-model="temp.registration_date"
+                  type="date"
+                  placeholder="Seleccione Fecha"
+                  style="width: 100%"
+                />
               </el-col>
-              <el-col :span="11" style="width: 100%;">
-                <el-time-picker v-model="temp.hours" type="fixed-time" placeholder="Seleccione hora" style="width: 100%;"/>
+              <el-col :span="11" style="width: 100%">
+                <el-time-picker
+                  v-model="temp.hours"
+                  type="fixed-time"
+                  placeholder="Seleccione hora"
+                  style="width: 100%"
+                />
               </el-col>
             </el-form-item>
-            <el-form-item label="Titulo de cita" prop="description" >
-              <el-input v-model="temp.description" style="width: 100%;"/>
+            <el-form-item label="Titulo de cita" prop="description">
+              <el-input v-model="temp.description" style="width: 100%" />
             </el-form-item>
             <el-form-item label="Veterinario" prop="personal_id">
-              <el-select v-model="temp.personal_id" placeholder="Veterinario" style="width: 100%;">
+              <el-select
+                v-model="temp.personal_id"
+                placeholder="Veterinario"
+                style="width: 100%"
+              >
                 <el-option
                   v-for="item in optionsPersonal"
                   :key="item.value"
@@ -319,8 +402,13 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Cliente" prop="client_id" >
-              <el-select v-model="temp.client_id" placeholder="Seleccione un cliente" @input="getListPet" style="width: 100%;">
+            <el-form-item label="Cliente" prop="client_id">
+              <el-select
+                v-model="temp.client_id"
+                placeholder="Seleccione un cliente"
+                @input="getListPet"
+                style="width: 100%"
+              >
                 <el-option
                   v-for="item in optionsClient"
                   :key="item.value"
@@ -329,8 +417,12 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Mascota" prop="pet_id" >
-              <el-select v-model="temp.pet_id" placeholder="Seleccione un mascota" style="width: 100%;">
+            <el-form-item label="Mascota" prop="pet_id">
+              <el-select
+                v-model="temp.pet_id"
+                placeholder="Seleccione un mascota"
+                style="width: 100%"
+              >
                 <el-option
                   v-for="item in optionsPet"
                   :key="item.value"
@@ -339,13 +431,16 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">
               {{ $t('table.cancel') }}
             </el-button>
-            <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+            <el-button
+              type="primary"
+              :disabled="validacionCita"
+              @click="dialogStatus === 'create' ? createData() : updateData()"
+            >
               {{ $t('table.confirm') }}
             </el-button>
           </div>

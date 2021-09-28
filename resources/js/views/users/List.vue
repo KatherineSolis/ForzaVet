@@ -11,17 +11,17 @@
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-plus" @click="handleCreate">
         {{ $t('table.add') }}
       </el-button>
-      <el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
+      <!--el-button v-waves :loading="downloading" class="filter-item" type="primary" icon="el-icon-download" @click="handleDownload">
         {{ $t('table.export') }}
-      </el-button>
+      </el-button-->
     </div>
 
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="ID" width="80">
+      <!--el-table-column align="center" label="ID" width="80">
         <template slot-scope="scope">
           <span>{{ scope.row.index }}</span>
         </template>
-      </el-table-column>
+      </el-table-column-->
 
       <el-table-column align="center" label="Name">
         <template slot-scope="scope">
@@ -43,21 +43,21 @@
 
       <el-table-column align="center" label="Acciones" width="350">
         <template slot-scope="scope">
-          <router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id" />
-          <!--el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
+          <!--router-link v-if="!scope.row.roles.includes('admin')" :to="'/administrator/users/edit/'+scope.row.id" /-->
+          <el-button v-if="!scope.row.roles.includes('admin')" v-permission="['manage permission']" type="warning" size="small" icon="el-icon-edit" @click="handleEditPermissions(scope.row.id);">
             Permissions
-          </el-button-->
-          <el-button v-if="scope.row.roles.includes('visitor')" v-permission="['manage user']" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
+          </el-button>
+          <el-button v-if="scope.row.roles.includes('veterinary')" type="danger" size="small" icon="el-icon-delete" @click="handleDelete(scope.row.id, scope.row.name);">
             Delete
           </el-button>
-          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id);">
+          <el-button v-if="!scope.row.roles.includes('admin')" type="primary" size="small" icon="el-icon-edit" @click="handleUpdate(scope.row.id);">
             editar
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" align="right"/>
 
     <el-dialog :visible.sync="dialogPermissionVisible" :title="'Edit Permissions - ' + currentUser.name">
       <div v-if="currentUser.name" v-loading="dialogPermissionLoading" class="form-container">
@@ -179,6 +179,7 @@ export default {
       loading: true,
       downloading: false,
       userCreating: false,
+      userEditing: false,
       dialogFormVisible1: false,
       user: {},
       query: {
@@ -187,7 +188,7 @@ export default {
         keyword: '',
         role: '',
       },
-      roles: ['admin', 'manager', 'editor', 'user', 'visitor'],
+      roles: ['admin', 'veterinary'],
       nonAdminRoles: ['admin', 'veterinary'],
       newUser: {},
       dialogFormVisible: false,
@@ -466,21 +467,33 @@ export default {
       });
     },
     updateUser(){
-      userResource
-        .update(this.user.id, this.user)
-        .then(response => {
-          this.dialogFormVisible1 = false;
-          this.$message({
-            message: 'Se actualizo correctamente',
-            type: 'success',
-            duration: 5 * 1000,
-          });
-          this.$router.go(0);
-        })
-        .catch(error => {
-          console.log(error);
-          this.dialogFormVisible1 = false;
-        });
+      this.$refs['userForm1'].validate((valid) => {
+        if (valid) {  
+          this.userEditing = true;
+          userResource
+            .update(this.user.id, this.user)
+            .then(response => {
+              this.$message({
+                message: 'Se actualizo correctamente',
+                type: 'success',
+                duration: 5 * 1000,
+              });
+              this.dialogFormVisible1 = false;
+              this.handleFilter();
+              //this.$router.go(0);
+            })
+            .catch(error => {
+              console.log(error);
+              this.dialogFormVisible1 = false;
+            })
+            .finally(() => {
+              this.userEditing = false;
+            });
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
     },
   },
 };

@@ -7,23 +7,7 @@
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
-            <el-input
-              v-model="listQuery.name"
-              placeholder=" vacuna"
-              style="width: 200px"
-              class="filter-item"
-              @keyup.enter.native="handleFilter"
-            />
 
-            <el-button
-              v-waves
-              class="filter-item"
-              type="primary"
-              icon="el-icon-search"
-              @click="handleFilter"
-            >
-              {{ $t('table.search') }}
-            </el-button>
             <el-button
               class="filter-item"
               style="margin-left: 10px"
@@ -135,7 +119,8 @@ export default {
         create: 'Crear',
       },
       rules: {
-        name_vaccines: [{ required: true, message: 'type is required', trigger: 'change' }],
+        name_vaccines: [{ required: true, message: 'type is required', trigger: 'change' },
+        { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur'}],
       },
       temp: {
         id: undefined,
@@ -156,11 +141,11 @@ export default {
     async getList() {
       this.listLoading = true;
       const { data } = await fetchList(this.listQuery);
-      console.log(data.items);
+      //console.log(data.items);
 
       this.list = data.items;
       this.total = data.total;
-      console.log(data.items);
+     //console.log(data.items);
       // Just to simulate the time of the request
       this.listLoading = false;
     },

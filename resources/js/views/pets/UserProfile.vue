@@ -3,7 +3,7 @@
     <el-form v-if="user">
       <el-row :gutter="20">
         <el-col :span="6">
-          <user-card :user="user" />
+          <user-card :user="user" :temp="temp"/>
           <!-- <user-bio /> -->
         </el-col>
         <el-col :span="18">
@@ -32,6 +32,7 @@ export default {
       vaccine: [],
       antiparasitic: [],
       peluqueria: [],
+      temp:[],
     };
   },
   watch: {
@@ -55,7 +56,7 @@ export default {
       this.vaccine = data.vaccine;
       this.antiparasitic = data.antiparasitic;
       this.peluqueria = data.peluqueria;
-      console.log(this.historial);
+      this.temp = data.items[0];
       // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
     },
   },

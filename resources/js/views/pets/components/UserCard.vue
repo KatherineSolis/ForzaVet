@@ -9,7 +9,7 @@
       </div>
       <div class="box-center">
         <div class="user-name text-center">
-          <p>{{ user.nombre_mascota }}</p>
+          <p>{{ user.name }}</p>
         </div>
         <div class="user-role text-center text-muted">
           <p>{{ user.specie }}</p>
@@ -28,17 +28,68 @@
       </div>
 
       <div class="user-follow">
+        <el-button type="primary" icon="el-icon-edit" size="small" @click="handleUpdate(temp)" style="width: 100%;font-size:14px;">
+          Editar 
+          </el-button>
+
+      </div>
+
+      <div class="user-follow">
         <router-link class="el-button el-button--success el-button--small" to="/mascotas/list" style="width: 100%;font-size:14px;">
           <i class="el-icon-back" /> Regresar
         </router-link>
 
       </div>
     </div>
+
+     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:100vh;">
+          <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left">
+            <el-form-item label="Nombre mascota" prop="name">
+              <el-input v-model="temp.name" placeholder="Nombre mascota" />
+            </el-form-item>
+            
+            <el-form-item label="Edad" prop="age" style="width: 100%;">
+              <el-input v-model="temp.age" />
+            </el-form-item>
+            <!--el-form-item label="Edad" prop="age">
+              <el-input v-model="temp.age" />
+            </el-form-item-->
+            <el-form-item label="Peso" prop="weight">
+              <el-input v-model="temp.weight" />
+            </el-form-item>
+            <el-form-item label="Color" prop="color">
+              <el-input v-model="temp.color" />
+            </el-form-item>
+            
+            <el-form-item label="Castrado" prop="castrated">
+              <el-input v-model="temp.castrated" />
+            </el-form-item>
+            <el-form-item label="Nivel de agresividad" prop="aggressiveness">
+              <el-select v-model="temp.aggressiveness" placeholder="Seleccionar" style="width:100%">
+                <el-option
+                  v-for="itemagre in typeaggressiveness"
+                  :key="itemagre.value"
+                  :label="itemagre.label"
+                  :value="itemagre.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">
+              {{ $t('table.cancel') }}
+            </el-button>
+            <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+              {{ $t('table.confirm') }}
+            </el-button>
+          </div>
+        </el-dialog>
   </el-card>
 </template>
 
 <script>
 import PanThumb from '@/components/PanThumb';
+import {updatePet } from '@/api/pet';
 
 export default {
   components: { PanThumb },
@@ -47,7 +98,25 @@ export default {
       type: Object,
       default: () => {
         return {
-          nombre_mascota: '',
+          name: '',
+          age: '',
+          sex: '',
+          weight: '',
+          color: '',
+          chip: '',
+          specie: '',
+          breed: '',
+          nombre_cliente: '',
+          email_cliente: '',
+          roles: [],
+        };
+      },
+    },
+    temp: {
+      type: Object,
+      default: () => {
+        return {
+          name: '',
           age: '',
           sex: '',
           weight: '',
@@ -63,8 +132,68 @@ export default {
     },
   },
   data() {
+    /*var numeros = (rule, value, callback) => {
+      if (/^[0-9]$/.test(value)) {
+              callback();
+            } else {
+              callback(new Error('solo se aceptan numeros'));
+            }
+    };*/
     return {
       info: {},
+       /*temp: {
+        id: undefined,
+        name: '',
+        age: '',
+        sex: '',
+        weight: '',
+        color: '',
+        chip: '',
+        client_id: '',
+        specie: '',
+        breed: '',
+        castrated: '',
+        aggressiveness: '',
+      },*/
+      rules: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+        age: [{ required: true, message: 'type is required', trigger: 'change' }],
+        sex: [{ required: true, message: 'type is required', trigger: 'change' }],
+        weight: [{ required: true, message: 'type is required', trigger: 'change' },
+                { pattern: /^\d*$/, message: 'Must be all numbers', trigger: 'blur'},
+                /*{ validator: numeros, trigger: ['blur'] }*/],
+        color: [{ required: true, message: 'type is required', trigger: 'change' }],
+        castrated: [{ required: true, message: 'type is required', trigger: 'change' }],
+        aggressiveness: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: 'Editar',
+        create: 'Crear',
+        visualizar: 'Detalle de la mascota',
+      },
+      typeaggressiveness: [
+        {
+          value: '1',
+          label: '1',
+        },
+        {
+          value: '2',
+          label: '2',
+        },
+        {
+          value: '3',
+          label: '3',
+        },
+        {
+          value: '4',
+          label: '4',
+        },
+        {
+          value: '5',
+          label: '5',
+        }],
       social: [
         {
           'name': 'info.nombre_cliente',
@@ -78,6 +207,44 @@ export default {
       ],
     };
   },
+  methods:{
+      handleUpdate(row) {
+      this.temp = Object.assign({}, row); // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible = true;
+    },
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          updatePet(this.temp).then(() => {
+            for (const v of this.list) {
+              if (v.id === this.temp.id) {
+                const index = this.list.indexOf(v);
+                this.list.splice(index, 1, this.temp);
+                break;
+              }
+            }
+            this.dialogFormVisible = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+          this.$router.go(0);
+        }
+      });
+    },
+    onlyNumber ($event) {
+   //console.log($event.keyCode); //keyCodes value
+   let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
+   if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
+      $event.preventDefault();
+   }
+}
+  }
   /* created(){
     this.info = this.$refs;
     console.log("Datos: ");

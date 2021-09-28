@@ -174,7 +174,7 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Edad" style="width: 100%;">
+            <el-form-item label="Edad" prop="age" style="width: 100%;">
               <el-input v-model="temp.age" />
             </el-form-item>
             <!--el-form-item label="Edad" prop="age">
@@ -471,11 +471,12 @@ export default {
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
+        console.log(this.$refs['dataForm']);
         if (valid) {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
-          this.temp.age = this.temp.numberage + ' ' + this.temp.textage;
-          if (this.temp.chip = ''){
+          //this.temp.age = this.temp.numberage + ' ' + this.temp.textage;
+          if (this.temp.chip == ''){
             this.temp.chip = 'no';
           }
           createPet(this.temp).then((response) => {
@@ -488,6 +489,7 @@ export default {
               type: 'success',
               duration: 2000,
             });
+            this.$router.go(0);
           });
         }
       });
@@ -495,7 +497,6 @@ export default {
     updateData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log(this.temp);
           updatePet(this.temp).then(() => {
             for (const v of this.list) {
               if (v.id === this.temp.id) {
@@ -512,6 +513,7 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(0);
         }
       });
     },

@@ -62,8 +62,8 @@ export default {
     };
     return {
       loginForm: {
-        email: 'Ingresa dirección de correo',
-        password: 'Password',
+        email: 'carlos.suarezv@outlook.com',
+        password: 'laravue@2021',
       },
       loginRules: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }],

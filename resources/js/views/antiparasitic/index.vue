@@ -7,7 +7,7 @@
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
-            <el-input
+            <!--el-input
               v-model="listQuery.name"
               placeholder=" antiparasitarios"
               style="width: 200px"
@@ -23,7 +23,7 @@
               @click="handleFilter"
             >
               {{ $t('table.search') }}
-            </el-button>
+            </el-button-->
             <el-button
               class="filter-item"
               style="margin-left: 10px"
@@ -135,7 +135,8 @@ export default {
         create: 'Crear',
       },
       rules: {
-        name_antiparasitic: [{ required: true, message: 'type is required', trigger: 'change' }],
+        name_antiparasitic: [{ required: true, message: 'type is required', trigger: 'change' },
+        { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur'}],
       },
       temp: {
         id: undefined,

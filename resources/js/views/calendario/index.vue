@@ -6,6 +6,7 @@ import FullCalendar from '@fullcalendar/vue';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import waves from '@/directive/waves'; // Waves directive
 import interactionPlugin from '@fullcalendar/interaction';
 import { fetchList, createCita, ListPersonal, ListClient, ListPet } from '@/api/appointment';
 // import Pagination from '@/components/Pagination';
@@ -16,7 +17,34 @@ export default {
     FullCalendar, // make the <FullCalendar> tag available
     // Pagination,
   },
+  directives: { waves },
   data() {
+    var validateCita = (rule, value, callback) => {
+      let dateStringArray = this.temp.registration_date.toLocaleDateString().split('/');
+      let fechaVal = dateStringArray[2]+'-'+this.fechaMes(dateStringArray[1])+'-'+this.fechaMes(dateStringArray[0]);
+      let timeString = this.temp.hours.toLocaleTimeString();
+      //let formatomes = this.fechaMes(dateStringArray[1]);
+      //console.log('formato mes', formatomes);
+      console.log('dateString', fechaVal);
+      console.log('timeString', timeString);
+
+      
+      console.log(value);
+      if (value >= 1 && fechaVal != '' && timeString != ''){
+          Object.entries(this.list).forEach(([key, valor]) => {
+              if (value == valor.personal_id && fechaVal == valor.registration_date && timeString == valor.hours ){
+                  console.log('No se puede registrar la cita', valor.registration_date);
+                  callback(new Error('Hola'));
+                  callback(new Error('No se puede registrar la cita'));
+              }else{
+                callback();
+              }
+            });
+      }else{
+        callback();
+      }
+      
+    };
     return {
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin, listPlugin, timeGridPlugin],
@@ -84,7 +112,7 @@ export default {
       optionsClient: [],
       optionsPet: [],
       textMap: {
-        update: 'Edit',
+        update: 'Editar',
         create: 'Crear',
       },
       rules: {
@@ -94,7 +122,8 @@ export default {
         client_id: [{ required: true, message: 'type is required', trigger: 'change' }],
         pet_id: [{ required: true, message: 'type is required', trigger: 'change' }],
         description: [{ required: true, message: 'type is required', trigger: 'change' }],
-        personal_id: [{ required: true, message: 'type is required', trigger: 'change' }],
+        personal_id: [{ required: true, message: 'type is required', trigger: 'change' },
+        {validator: validateCita, trigger:['blur', 'change'] }],
       },
       temp: {
         id: undefined,
@@ -231,7 +260,7 @@ export default {
           this.temp.id = this.list[this.list.length - 1].id + 1;
           this.temp.status = 1;
           this.temp.hours = splitHoras.hours.toLocaleTimeString();
-          this.temp.registration_date = `${arrayHoras[2]}-0${arrayHoras[1]}-${arrayHoras[0]}`;
+          this.temp.registration_date = `${arrayHoras[2]}-${arrayHoras[1]}-${arrayHoras[0]}`;
           createCita(this.temp).then((response) => {
             this.dialogFormVisible = false;
             this.$router.go(0);
@@ -245,6 +274,13 @@ export default {
         }
       });
     },
+    fechaMes(mes){
+      if(mes <= 9 && mes >= 1){
+        return "0"+mes;
+      }else{
+        return mes;
+      }
+    }
   },
 };
 </script>
@@ -260,13 +296,21 @@ export default {
         <br>
         <br>
         <FullCalendar ref="fullCalendar" :options="calendarOptions" />
-        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-          <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 500px; margin-left:50px;">
-            <el-form-item label="Titulo de cita" prop="description" style="width: 100%;">
-              <el-input v-model="temp.description" />
+        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:100vh;">
+          <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
+            <el-form-item label="Fecha/Hora de cita" prop="registration_date">
+              <el-col :span="11" style="width: 100%;">
+                <el-date-picker v-model="temp.registration_date" type="date" placeholder="Seleccione Fecha" style="width: 100%;"/>
+              </el-col>
+              <el-col :span="11" style="width: 100%;">
+                <el-time-picker v-model="temp.hours" type="fixed-time" placeholder="Seleccione hora" style="width: 100%;"/>
+              </el-col>
+            </el-form-item>
+            <el-form-item label="Titulo de cita" prop="description" >
+              <el-input v-model="temp.description" style="width: 100%;"/>
             </el-form-item>
             <el-form-item label="Veterinario" prop="personal_id">
-              <el-select v-model="temp.personal_id" placeholder="Veterinario">
+              <el-select v-model="temp.personal_id" placeholder="Veterinario" style="width: 100%;">
                 <el-option
                   v-for="item in optionsPersonal"
                   :key="item.value"
@@ -275,8 +319,8 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Cliente" prop="client_id">
-              <el-select v-model="temp.client_id" placeholder="Seleccione un cliente" @input="getListPet">
+            <el-form-item label="Cliente" prop="client_id" >
+              <el-select v-model="temp.client_id" placeholder="Seleccione un cliente" @input="getListPet" style="width: 100%;">
                 <el-option
                   v-for="item in optionsClient"
                   :key="item.value"
@@ -285,8 +329,8 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Mascota" prop="pet_id">
-              <el-select v-model="temp.pet_id" placeholder="Seleccione un mascota">
+            <el-form-item label="Mascota" prop="pet_id" >
+              <el-select v-model="temp.pet_id" placeholder="Seleccione un mascota" style="width: 100%;">
                 <el-option
                   v-for="item in optionsPet"
                   :key="item.value"
@@ -295,17 +339,7 @@ export default {
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Fecha/Hora de cita" style="width: 100%;" prop="registration_date">
-              <el-col :span="11">
-                <el-date-picker v-model="temp.registration_date" type="date" placeholder="Seleccione Fecha" style="width: 100%;" />
-              </el-col>
-              <el-col :span="2" class="line">
-                -
-              </el-col>
-              <el-col :span="11">
-                <el-time-picker v-model="temp.hours" type="fixed-time" placeholder="Seleccione hora" style="width: 100%;" />
-              </el-col>
-            </el-form-item>
+            
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogFormVisible = false">

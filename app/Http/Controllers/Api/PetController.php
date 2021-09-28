@@ -195,7 +195,7 @@ class PetController extends Controller
         //
         $pet = Pet::select(
             'pets.id',
-            'pets.name AS nombre_mascota',
+            'pets.name',
             'pets.age',
             'pets.sex',
             'pets.weight',

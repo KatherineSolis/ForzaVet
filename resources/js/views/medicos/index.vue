@@ -3,16 +3,7 @@
     <el-row>
       <el-card class="box-card" style="height: 90vh">
         <div slot="header" class="clearfix">
-          <span>Lista de veterinarios</span>
-          <el-button
-            class="filter-item"
-            style="float:right;"
-            type="primary"
-            icon="el-icon-plus"
-            @click="handleCreate"
-          >
-            {{ $t('table.add') }}
-          </el-button>
+          <span>Veterinarios</span>
         </div>
         <div style="margin-bottom: 50px">
           <div class="filter-container">
@@ -33,7 +24,15 @@
             >
               {{ $t('table.search') }}
             </el-button>
-
+            <el-button
+              class="filter-item"
+              style="margin-left: 10px"
+              type="primary"
+              icon="el-icon-plus"
+              @click="handleCreate"
+            >
+              {{ $t('table.add') }}
+            </el-button>
           </div>
         </div>
         <el-table
@@ -47,7 +46,7 @@
           @sort-change="sortChange"
         >
           <el-table-column
-            label="Tipo"
+            label="Tipo de documento"
             prop="document_type"
             align="center"
             width="150px"
@@ -57,7 +56,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            label="Número"
+            label="Numero de documento"
             prop="document_number"
             align="center"
             width="180px"
@@ -70,15 +69,24 @@
             label="Nombre"
             prop="name"
             align="center"
-            min-width="180px"
+            width="150px"
           >
             <template slot-scope="scope">
               <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span>
             </template>
           </el-table-column>
-
           <el-table-column
-            label="Teléfono"
+            label="Direccion"
+            prop="direction"
+            align="center"
+            min-width="150px"
+          >
+            <template slot-scope="scope">
+              <span>{{ scope.row.direction }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="Telefono"
             prop="phone"
             align="center"
             width="150px"
@@ -101,7 +109,7 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
+          <el-table-column label="Acciones" align="center" width="330" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
               <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
               <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
@@ -114,12 +122,13 @@
           </el-table-column>
         </el-table>
 
-        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" align="right" @pagination="getList" />
+        <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:80vh;">
+        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:50vh;">
+
           <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
             <el-form-item label="Tipo:" prop="document_type">
-              <el-select v-model="temp.document_type" placeholder="Seleccionar" style="width:100%;">
+              <el-select v-model="temp.document_type" placeholder="Seleccionar" id="document_type" style="width:100%">
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -137,13 +146,13 @@
             <el-form-item label="Apellido:" prop="last_name">
               <el-input v-model="temp.last_name" />
             </el-form-item>
-            <el-form-item label="Dirección:" prop="direction">
+            <el-form-item label="Dirección" prop="direction">
               <el-input v-model="temp.direction" />
             </el-form-item>
-            <el-form-item label="Correo:" prop="email">
+            <el-form-item label="Correo" prop="email">
               <el-input v-model="temp.email" />
             </el-form-item>
-            <el-form-item label="Teléfono:" prop="phone">
+            <el-form-item label="Teléfono" prop="phone">
               <el-input v-model="temp.phone" />
             </el-form-item>
           </el-form>
@@ -155,6 +164,7 @@
               {{ $t('table.confirm') }}
             </el-button>
           </div>
+
         </el-dialog>
 
       </el-card>
@@ -170,6 +180,49 @@ export default {
   components: { Pagination },
   directives: { waves },
   data() {
+    var validateDocumentType = (rule, value, callback) => {
+      let select = document.getElementById('document_type').value;
+      if(select === "Cedula"){
+        let valCedula = this.verificarCedula(value);
+        if (valCedula !== true && value.length == 10) {
+          callback(new Error('Número de cédula es inválido'));
+        } else if(value.length > 10){
+          callback(new Error('La Cédula requiere de 10 digitos'));
+        }else {
+          if (this.dialogStatus === "create"){
+            Object.entries(this.list).forEach(([key, valor]) => {
+              if (value === valor.document_number){
+                  callback(new Error('Número de cédula ya está registrado'));
+              }else{
+                callback();
+              }
+            });
+          }else {
+            callback();
+          }
+        }
+      }else{
+        let valRuc = this.verificacionRuc(value);
+        if (valRuc !== true && value.length == 13) {
+          callback(new Error('Número de RUC es inválido'));
+        } else if(value.length >= 10 && value.length < 13){
+          callback(new Error('El RUC requiere de 13 digitos'));
+        } else {
+          if (this.dialogStatus === "create"){
+            Object.entries(this.list).forEach(([key, valor]) => {
+              if (value === valor.document_number){
+                  callback(new Error('Número de RUC ya está registrado'));
+              }else{
+                callback();
+              }
+            });
+          }else {
+            callback();
+          }
+        }
+      }
+      
+    };
     return {
       tableKey: 0,
       total: 0,
@@ -187,12 +240,30 @@ export default {
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
-        update: 'Edit',
+        update: 'Editar',
         create: 'Crear',
       },
       rules: {
         name: [{ required: true, message: 'type is required', trigger: 'change' }],
-        observation: [{ required: true, message: 'type is required', trigger: 'change' }],
+        document_type: [{ required: true, message: 'type is required', trigger: 'change' }],
+        document_number: [
+          { required: true, message: 'type is required', trigger: 'change' },
+          { min: 10, message: 'El campo requiere de 10 digitos', trigger: ['blur', 'change']},
+          { max: 13, message: 'Este campo acepta máximo 13 digitos', trigger: ['blur', 'change']},
+          { validator: validateDocumentType, trigger: 'blur' }],
+        first_name: [{ required: true, message: 'type is required', trigger: 'change' },
+                     { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur'}],
+        last_name: [{ required: true, message: 'type is required', trigger: 'change' },
+                    { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur'}],
+        direction: [{ required: true, message: 'type is required', trigger: 'change' }],
+        email: [
+          { required: true, message: 'Email is required', trigger: 'blur' },
+          { type: 'email', message: 'Please input correct email address', trigger: ['blur', 'change'] },
+        ],
+        phone: [{ required: true, message: 'type is required', trigger: 'change' },
+                { min: 7, message: 'El campo requiere de 7 digitos', trigger: ['blur', 'change']},
+                { max: 10, message: 'Este campo acepta máximo 10 digitos', trigger: ['blur', 'change']},
+                { pattern: /^\d*$/, message: 'Solo se puede ingresar número', trigger: 'blur'}],
       },
       temp: {
         id: undefined,
@@ -205,8 +276,8 @@ export default {
           label: 'Cedula',
         },
         {
-          value: 'Ruc',
-          label: 'Ruc',
+          value: 'RUC',
+          label: 'RUC',
         }],
     };
   },
@@ -312,6 +383,170 @@ export default {
         this.$refs['dataForm'].clearValidate();
       });
     },
+    verificarCedula(cedula) {
+      if (typeof(cedula) == 'string' && cedula.length == 10 && /^\d+$/.test(cedula)) {
+        var digitos = cedula.split('').map(Number);
+        var codigo_provincia = digitos[0] * 10 + digitos[1];
+
+        //if (codigo_provincia >= 1 && (codigo_provincia <= 24 || codigo_provincia == 30) && digitos[2] < 6) {
+
+        if (codigo_provincia >= 1 && (codigo_provincia <= 24 || codigo_provincia == 30)) {
+          var digito_verificador = digitos.pop();
+
+          var digito_calculado = digitos.reduce(
+            function (valorPrevio, valorActual, indice) {
+              return valorPrevio - (valorActual * (2 - indice % 2)) % 9 - (valorActual == 9) * 9;
+            }, 1000) % 10;
+          return digito_calculado === digito_verificador;
+        }
+      }
+      return false;
+    },
+    verificacionRuc(numero){
+        var suma = 0;      
+        var residuo = 0;      
+        var pri = false;      
+        var pub = false;            
+        var nat = false;      
+        var numeroProvincias = 24;                  
+        var modulo = 11;
+                    
+        /* Verifico que el campo no contenga letras */                  
+        var ok=1;
+        for (let i=0; i<numero.length && ok==1 ; i++){
+          var n = parseInt(numero.charAt(i));
+          if (isNaN(n)) ok=0;
+        }
+        if (ok==0){
+          //alert("No puede ingresar caracteres en el número");         
+          return false;
+        }
+                    
+        if (numero.length < 10 ){              
+          //alert('El número ingresado no es válido');                  
+          return false;
+        }
+      
+        /* Los primeros dos digitos corresponden al codigo de la provincia */
+        let provincia = numero.substr(0,2);      
+        if (provincia < 1 || provincia > numeroProvincias){           
+          //alert('El código de la provincia (dos primeros dígitos) es inválido');
+          return false;       
+        }
+
+        /* Aqui almacenamos los digitos de la cedula en variables. */
+        var d1  = numero.substr(0,1);         
+        var d2  = numero.substr(1,1);         
+        var d3  = numero.substr(2,1);         
+        var d4  = numero.substr(3,1);         
+        var d5  = numero.substr(4,1);         
+        var d6  = numero.substr(5,1);         
+        var d7  = numero.substr(6,1);         
+        var d8  = numero.substr(7,1);         
+        var d9  = numero.substr(8,1);         
+        var d10 = numero.substr(9,1);                
+          
+        /* El tercer digito es: */                           
+        /* 9 para sociedades privadas y extranjeros   */         
+        /* 6 para sociedades publicas */         
+        /* menor que 6 (0,1,2,3,4,5) para personas naturales */ 
+
+        if (d3==7 || d3==8){           
+          //alert('El tercer dígito ingresado es inválido');                     
+          return false;
+        }         
+          
+        /* Solo para personas naturales (modulo 10) */         
+        if (d3 < 6){           
+          nat = true;            
+          var p1 = d1 * 2;  if (p1 >= 10) p1 -= 9;
+          var p2 = d2 * 1;  if (p2 >= 10) p2 -= 9;
+          var p3 = d3 * 2;  if (p3 >= 10) p3 -= 9;
+          var p4 = d4 * 1;  if (p4 >= 10) p4 -= 9;
+          var p5 = d5 * 2;  if (p5 >= 10) p5 -= 9;
+          var p6 = d6 * 1;  if (p6 >= 10) p6 -= 9; 
+          var p7 = d7 * 2;  if (p7 >= 10) p7 -= 9;
+          var p8 = d8 * 1;  if (p8 >= 10) p8 -= 9;
+          var p9 = d9 * 2;  if (p9 >= 10) p9 -= 9;             
+          modulo = 10;
+        }         
+
+        /* Solo para sociedades publicas (modulo 11) */                  
+        /* Aqui el digito verficador esta en la posicion 9, en las otras 2 en la pos. 10 */
+        else if(d3 == 6){           
+          pub = true;             
+          var p1 = d1 * 3;
+          var p2 = d2 * 2;
+          var p3 = d3 * 7;
+          var p4 = d4 * 6;
+          var p5 = d5 * 5;
+          var p6 = d6 * 4;
+          var p7 = d7 * 3;
+          var p8 = d8 * 2;            
+          var p9 = 0;            
+        }         
+          
+        /* Solo para entidades privadas (modulo 11) */         
+        else if(d3 == 9) {           
+          pri = true;                                   
+          p1 = d1 * 4;
+          p2 = d2 * 3;
+          p3 = d3 * 2;
+          p4 = d4 * 7;
+          p5 = d5 * 6;
+          p6 = d6 * 5;
+          p7 = d7 * 4;
+          p8 = d8 * 3;
+          p9 = d9 * 2;            
+        }
+                  
+        suma = p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9;                
+        residuo = suma % modulo;                                         
+
+        /* Si residuo=0, dig.ver.=0, caso contrario 10 - residuo*/
+        var digitoVerificador = residuo==0 ? 0: modulo - residuo;                
+
+        /* ahora comparamos el elemento de la posicion 10 con el dig. ver.*/                         
+        if (pub==true){           
+          if (digitoVerificador != d9){                          
+              //alert('El ruc de la empresa del sector público es incorrecto.');
+              console.log('publica');            
+              return false;
+          }                  
+          /* El ruc de las empresas del sector publico terminan con 0001*/         
+          if ( numero.substr(9,4) != '0001' ){    
+              console.log('publica');                
+              //alert('El ruc de la empresa del sector público debe terminar con 0001');
+              return false;
+          }
+        }         
+        else if(pri == true){         
+          if (digitoVerificador != d10){                          
+              //alert('El ruc de la empresa del sector privado es incorrecto.');
+              console.log('sector privado');
+              return false;
+          }         
+          if ( numero.substr(10,3) != '001' ){      
+            console.log('sector privado');              
+              //alert('El ruc de la empresa del sector privado debe terminar con 001');
+              return false;
+          }
+        }      
+
+        else if(nat == true){         
+          if (digitoVerificador != d10){      
+              console.log('persona natural es incorrecto');                  
+              //alert('El número de cédula de la persona natural es incorrecto.');
+              return false;
+          }         
+          if (numero.length >10 && numero.substr(10,3) != '001' ){                    
+              //alert('El ruc de la persona natural debe terminar con 001');
+              console.log('persona natural');
+              return false;
+          }
+        }      
+        return true;   
+   },
 
   },
 };

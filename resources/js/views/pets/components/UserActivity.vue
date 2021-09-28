@@ -349,13 +349,13 @@
             </el-table-column>
 
           </el-table>
-          <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible1">
-            <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="180px" style="width: 500px; margin-left:50px;">
+          <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible1" style="min-width:100vh;">
+            <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
               <el-form-item label="Fecha">
-                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" disabled />
+                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" disabled style="width: 100%;"/>
               </el-form-item>
               <el-form-item label="Nombre Cliente" prop="client_id">
-                <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." disabled @input="getListClient">
+                <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." style="width: 100%;" disabled @input="getListClient">
                   <el-option
                     v-for="(item, index) in optionsClient"
                     :key="'Z'+index"
@@ -378,7 +378,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="Diagnostivo" prop="diagnostic">
-                <el-input v-model="temp.diagnostic" type="textarea" />
+                <el-input v-model="temp.diagnostic" type="textarea" style="width: 100%;"/>
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">

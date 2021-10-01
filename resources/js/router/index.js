@@ -42,197 +42,204 @@ import adminRoutes from './modules/admin';
 **/
 
 export const constantRoutes = [{
-        path: '/redirect',
-        component: Layout,
-        hidden: true,
-        children: [{
-            path: '/redirect/:path*',
-            component: () =>
+  path: '/redirect',
+  component: Layout,
+  hidden: true,
+  children: [{
+    path: '/redirect/:path*',
+    component: () =>
                 import ('@/views/redirect/index'),
-        }],
-    },
-    {
-        path: '/login',
-        component: () =>
+  }],
+},
+{
+  path: '/login',
+  component: () =>
             import ('@/views/login/index'),
-        hidden: true,
-    },
-    {
-        path: '/auth-redirect',
-        component: () =>
+  hidden: true,
+},
+{
+  path: '/auth-redirect',
+  component: () =>
             import ('@/views/login/AuthRedirect'),
-        hidden: true,
-    },
-    /* {
-                                        path: '/404',
-                                        redirect: { name: 'Page404' },
-                                        component: () =>
-                                            import ('@/views/error-page/404'),
-                                        hidden: true,
-                                    },
-                                    {
-                                        path: '/401',
-                                        component: () =>
-                                            import ('@/views/error-page/401'),
-                                        hidden: true,
-                                    },*/
-    {
-        path: '',
-        component: Layout,
-        redirect: 'dashboard',
-        children: [{
-            path: 'dashboard',
+  hidden: true,
+},
+/* {
+            path: '/404',
+            redirect: { name: 'Page404' },
             component: () =>
+                import ('@/views/error-page/404'),
+            hidden: true,
+        },
+        {
+            path: '/401',
+            component: () =>
+                import ('@/views/error-page/401'),
+            hidden: true,
+        },*/
+{
+  path: '',
+  component: Layout,
+  redirect: 'dashboard',
+  children: [{
+    path: 'dashboard',
+    component: () =>
                 import ('@/views/dashboard/index'),
-            name: 'Dashboard',
-            meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
-        }],
-    },
+    name: 'Dashboard',
+    meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
+  }],
+},
 ];
 
 export const asyncRoutes = [{
-        path: '',
-        component: Layout,
-        children: [{
-            path: 'client',
-            component: () =>
+  path: '',
+  component: Layout,
+  children: [{
+    path: 'client',
+    component: () =>
                 import ('@/views/client/Index'),
-            name: 'client',
-            meta: { title: 'Clientes', icon: 'peoples', noCache: false },
-        }],
-    },
-    {
-        path: '/mascotas',
-        component: Layout,
-        children: [{
-                path: 'list',
-                component: () =>
+    name: 'client',
+    meta: { title: 'Clientes', icon: 'peoples', noCache: false },
+  }],
+},
+{
+  path: '/mascotas',
+  component: Layout,
+  children: [{
+    path: 'list',
+    component: () =>
                     import ('@/views/pets/index'),
-                name: 'pets',
-                meta: { title: 'Mascotas', icon: 'qq', noCache: false },
-            },
-            {
-                path: 'pet/edit/:id(\\d+)',
-                component: () =>
+    name: 'pets',
+    meta: { title: 'Mascotas', icon: 'qq', noCache: false },
+  },
+  {
+    path: 'pet/edit/:id(\\d+)',
+    component: () =>
                     import ('@/views/pets/UserProfile'),
-                name: 'EditPet',
-                meta: { title: 'Edit Pet', noCache: true },
-                hidden: true,
-            },
-            {
-                path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'newVisitt',
-                component: () =>
+    name: 'Historial',
+    meta: { title: 'Historial Clinico', noCache: true },
+    hidden: true,
+  },
+  {
+    path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'newVisitt',
+    component: () =>
                     import ('@/views/visit/clinic_history'),
-                meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
-                hidden: true,
-            },
-        ],
-    },
-    {
-        path: '/agenda',
-        component: Layout,
-        redirect: '/agenda/index',
-        name: 'agenda',
-        meta: {
-            title: 'Agenda',
-            icon: 'clipboard', // Using SVG icon
-        },
-        children: [{
-                path: 'citas', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'FullCalendar',
-                component: () =>
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+    hidden: true,
+  },
+  ],
+},
+{
+  path: '/agenda',
+  component: Layout,
+  redirect: '/agenda/index',
+  name: 'agenda',
+  meta: {
+    title: 'Agenda',
+    icon: 'clipboard', // Using SVG icon
+  },
+  children: [{
+    path: 'citas', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'FullCalendar',
+    component: () =>
                     import ('@/views/calendario/index'),
-                meta: { title: 'Citas', icon: 'edit' }, // foo submenu
-            },
-            {
-                path: 'listarcita', // When clicking this submenu, it will redirect to /#/foo/bar
-                name: 'listarcita',
-                component: () =>
+    meta: { title: 'Citas', icon: 'edit' }, // foo submenu
+  },
+  {
+    path: 'agendar/citas', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'FullCalendar1',
+    component: () =>
+                    import ('@/views/calendario/calendar'),
+    meta: { title: 'Citas', icon: 'edit' }, // foo submenu
+  },
+  {
+    path: 'listarcita', // When clicking this submenu, it will redirect to /#/foo/bar
+    name: 'listarcita',
+    component: () =>
                     import ('@/views/citas/index'),
-                meta: { title: 'Listar Citas', icon: 'list' }, // bar submenu
-            },
-            {
-                path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'newVisit',
-                component: () =>
+    meta: { title: 'Listar Citas', icon: 'list' }, // bar submenu
+  },
+  {
+    path: 'visit/new/:id(\\d+)', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'newVisit',
+    component: () =>
                     import ('@/views/visit/index'),
-                meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
-                hidden: true,
-            },
-        ],
-    },
-    {
-        path: '/servicio',
-        component: Layout,
-        redirect: '/servicio/index',
-        name: 'servicio',
-        meta: {
-            title: 'Servicio',
-            icon: 'component', // Using SVG icon
-        },
-        children: [{
-                path: 'visit', // When clicking this submenu, it will redirect to /#/foo/index
-                name: 'visitList',
-                component: () =>
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+    hidden: true,
+  },
+  ],
+},
+{
+  path: '/servicio',
+  component: Layout,
+  redirect: '/servicio/index',
+  name: 'servicio',
+  meta: {
+    title: 'Servicio',
+    icon: 'component', // Using SVG icon
+  },
+  children: [{
+    path: 'visit', // When clicking this submenu, it will redirect to /#/foo/index
+    name: 'visitList',
+    component: () =>
                     import ('@/views/visit/list'),
-                meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
-            },
-            {
-                path: 'peluqueria', // When clicking this submenu, it will redirect to /#/foo/bar
-                name: 'peluqueriaList',
-                component: () =>
+    meta: { title: 'Visitas', icon: 'el-icon-date' }, // foo submenu
+  },
+  {
+    path: 'peluqueria', // When clicking this submenu, it will redirect to /#/foo/bar
+    name: 'peluqueriaList',
+    component: () =>
                     import ('@/views/peluqueria/index'),
-                meta: { title: 'Peluquería', icon: 'list' }, // bar submenu
-            },
-            {
-                path: 'peluqueria/create/:id(\\d+)',
-                name: 'peluqueria',
-                component: () =>
+    meta: { title: 'Peluquería', icon: 'list' }, // bar submenu
+  },
+  {
+    path: 'peluqueria/create/:id(\\d+)',
+    name: 'peluqueria',
+    component: () =>
                     import ('@/views/peluqueria/create'),
-                meta: { title: 'Peluqueria' },
-                hidden: true,
-            },
-            {
-                path: 'vaccine/create/:id(\\d+)',
-                component: () =>
+    meta: { title: 'Peluqueria' },
+    hidden: true,
+  },
+  {
+    path: 'vaccine/create/:id(\\d+)',
+    component: () =>
                     import ('@/views/vaccine/create'),
-                meta: { title: 'Vacunación' },
-                hidden: true,
-            },
-            {
-                path: 'antiparasitic/create/:id(\\d+)',
-                component: () =>
+    meta: { title: 'Vacunación' },
+    hidden: true,
+  },
+  {
+    path: 'antiparasitic/create/:id(\\d+)',
+    component: () =>
                     import ('@/views/antiparasitic/create'),
-                meta: { title: 'Antiparasitario' },
-                hidden: true,
-            },
-        ],
-    },
-    {
-        path: '',
-        component: Layout,
-        children: [{
-            path: 'vaccine',
-            component: () =>
+    meta: { title: 'Antiparasitario' },
+    hidden: true,
+  },
+  ],
+},
+{
+  path: '',
+  component: Layout,
+  children: [{
+    path: 'vaccine',
+    component: () =>
                 import ('@/views/vaccine/index'),
-            name: 'vacunas',
-            meta: { title: 'Vacunas', icon: 'peoples', noCache: false, permissions: ['view menu administrator'], },
-        }],
-    },
-    {
-        path: '',
-        component: Layout,
-        children: [{
-            path: 'antiparasitaric',
-            component: () =>
+    name: 'vacunas',
+    meta: { title: 'Vacunas', icon: 'peoples', noCache: false, permissions: ['view menu administrator'] },
+  }],
+},
+{
+  path: '',
+  component: Layout,
+  children: [{
+    path: 'antiparasitaric',
+    component: () =>
                 import ('@/views/antiparasitic/index'),
-            name: 'antiparasitaric',
-            meta: { title: 'Antiparasitarios', icon: 'peoples', noCache: false, permissions: ['view menu administrator'] },
-        }],
-    },
-    adminRoutes,
-    /* {
+    name: 'antiparasitaric',
+    meta: { title: 'Antiparasitarios', icon: 'peoples', noCache: false, permissions: ['view menu administrator'] },
+  }],
+},
+adminRoutes,
+/* {
                 path: '/inventario',
                 component: Layout,
                 redirect: '/inventario/index',
@@ -264,27 +271,27 @@ export const asyncRoutes = [{
                     },
                 ],
             },*/
-    {
-        path: '/404',
-        component: () =>
+{
+  path: '/404',
+  component: () =>
             import ('@/views/error-page/404'),
-        hidden: true,
-    },
+  hidden: true,
+},
 ];
 
 const createRouter = () => new Router({
-    // mode: 'history', // require service support
-    scrollBehavior: () => ({ y: 0 }),
-    base: process.env.MIX_LARAVUE_PATH,
-    routes: constantRoutes,
+  // mode: 'history', // require service support
+  scrollBehavior: () => ({ y: 0 }),
+  base: process.env.MIX_LARAVUE_PATH,
+  routes: constantRoutes,
 });
 
 const router = createRouter();
 
 // Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
 export function resetRouter() {
-    const newRouter = createRouter();
-    router.matcher = newRouter.matcher; // reset router
+  const newRouter = createRouter();
+  router.matcher = newRouter.matcher; // reset router
 }
 
 export default router;

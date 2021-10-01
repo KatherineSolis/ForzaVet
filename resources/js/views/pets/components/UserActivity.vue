@@ -1,8 +1,6 @@
 <template>
   <el-card v-if="user.nombre_cliente">
-    <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
-      <i class="el-icon-back" />
-    </router-link>
+   
     <el-tabs v-model="activeActivity">
       <el-tab-pane label="Datos del paciente" name="first">
         <div class="user-activity">
@@ -228,7 +226,7 @@
           </el-timeline>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="Antiparasitarios" name="fourth">
+      <el-tab-pane label="Desparasitación" name="fourth">
         <div class="block">
           <div slot="header" class="clearfix">
 
@@ -240,7 +238,7 @@
           <el-timeline>
             <el-timeline-item v-for="(item, index) in antiparasitic" :key="'E'+index" :timestamp="item.date" placement="top">
               <el-card>
-                <h4>Nombre Desparacitante: {{ item.name_antiparasitic }}</h4>
+                <h4>Medicamento: {{ item.name_antiparasitic }}</h4>
                 <p>{{ item.weight }} Kg - {{ item.antiparasitic_observation }}</p>
                 <el-button type="danger" icon="el-icon-delete" size="small" @click="handleModifyStatus3(item, 0)" />
               </el-card>
@@ -290,7 +288,7 @@
           </el-timeline>
         </div>
       </el-tab-pane>
-      <el-tab-pane label="Estética y baños" name="sixth">
+      <el-tab-pane label="Peluquería" name="sixth">
         <div class="user-activity">
           <div slot="header" class="clearfix">
             <span>Resultados</span>

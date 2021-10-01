@@ -6,7 +6,7 @@
           <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
             <i class="el-icon-back" />
           </router-link>
-          <span>Nueva estética</span>
+          <span>Desparasitación</span>
           <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="myFunction"><!----><i class="el-icon-check" /><span>
             Guardar
           </span></button>
@@ -16,7 +16,7 @@
 
           <el-form ref="form" :rules="rules" :model="form" label-width="100px">
 
-            <el-form-item label="Propietario" prop="client_id">
+            <el-form-item label="Propietario:" prop="client_id">
               <el-select v-model="form.client_id" placeholder="Seleccione Cliente..." style="width: 100%;" disabled @input="getListPet">
                 <el-option
                   v-for="(item, index) in optionsClient"
@@ -26,7 +26,7 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Paciente" prop="pet_id">
+            <el-form-item label="Paciente:" prop="pet_id">
               <el-select v-model="form.pet_id" placeholder="Seleccione mascota..." style="width: 100%;" disabled>
                 <el-option
                   v-for="(item, index) in optionsPet"
@@ -37,7 +37,7 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="Tipo" prop="antiparasitic_id">
+            <el-form-item label="Tipo:" prop="antiparasitic_id">
               <el-select v-model="form.antiparasitic_id" placeholder="Seleccione tipo..." style="width: 100%;">
                 <el-option
                   v-for="(item, index) in optionsAntiparasitic"
@@ -48,7 +48,11 @@
               </el-select>
             </el-form-item>
 
-            <el-form-item label="Detalles">
+            <el-form-item label="Peso:">
+              <el-input v-model="form.weight" type="text" style="width: 100%;" />
+            </el-form-item>
+
+            <el-form-item label="Detalles:">
               <el-input v-model="form.antiparasitic_observation" type="textarea" style="width: 100%;" />
             </el-form-item>
 
@@ -82,6 +86,7 @@ export default {
         client_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
         pet_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
         antiparasitic_id: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
+        weight: [{ required: true, message: 'Este campo es requerido', trigger: 'change' }],
       },
       form: {
         date: '',

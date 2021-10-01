@@ -97,6 +97,7 @@ class Clinic_historyController extends Controller
             $antiparasitic = new Antiparasitic_history([
                 'clinic_history_id' => $request->id,
                 'antiparasitic_id' => $request->antiparasitic_id,
+                'weight' => $request->weight,
                 'observation' => $request->antiparasitic_observation,
             ]);
             $antiparasitic->save();

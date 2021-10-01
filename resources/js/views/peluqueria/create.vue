@@ -6,7 +6,7 @@
           <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
             <i class="el-icon-back" />
           </router-link>
-          <span>Nueva estética</span>
+          <span>Nueva peluquería</span>
 
         </div>
 

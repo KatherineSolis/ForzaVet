@@ -11,6 +11,7 @@ class Antiparasitic_history extends Model
     protected $fillable = [
         'clinic_history_id',
         'antiparasitic_id',
+        'weight',
         'observation',
     ];
 }

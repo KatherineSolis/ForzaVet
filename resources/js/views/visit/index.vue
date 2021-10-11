@@ -42,7 +42,15 @@
               </el-select>
             </el-form-item>
             <el-form-item label="Motivo de visita" prop="reason">
-              <el-input v-model="form.reason" type="textarea" style="width: 100%;" />
+             
+              <el-select v-model="form.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+                <el-option
+                  v-for="(item, index) in options"
+                  :key="'c'+index"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
             </el-form-item>
 
             <el-form-item label="Anamnesis" prop="anamnesis">
@@ -171,6 +179,28 @@ export default {
       optionsPet: [],
       optionsVaccine: [],
       optionsAntiparasitic: [],
+      options: [
+        {
+          value: 'Consulta',
+          label: 'Consulta',
+        },
+        {
+          value: 'Cirugia',
+          label: 'Cirugia',
+        },
+        {
+          value: 'Examen',
+          label: 'Examen',
+        },
+        {
+          value: 'Vacunación',
+          label: 'Vacunación',
+        },
+        
+        {
+          value: 'Desparasitación',
+          label: 'Desparasitación',
+        }],
       form: {
         id: undefined,
         date: '',
@@ -189,6 +219,7 @@ export default {
         prescription: '',
         type: true,
       },
+      consulta: {},
     };
   },
   watch: {
@@ -230,6 +261,7 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(-1);
         }
       });
       // this.$message('submit!');
@@ -239,6 +271,7 @@ export default {
         message: 'cancel!',
         type: 'warning',
       });
+      this.$router.go(-1);
     },
     mostrarVacunas() {
       const x = document.getElementById('mostrar');
@@ -349,8 +382,9 @@ export default {
     },
     async getAppointment(id) {
       const { data } = await getAppointment(id);
-      this.form = data.items[0];
-      this.form.reason = this.form.description;
+      this.consulta = data.items[0];
+      this.form.reason = this.consulta.description;
+      this.form.dateTime = this.consulta.dateTime;
       // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
     },
 

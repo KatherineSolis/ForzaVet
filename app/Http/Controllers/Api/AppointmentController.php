@@ -34,6 +34,7 @@ class AppointmentController extends Controller
             'appointments.description',
             'appointments.registration_date',
             'appointments.hours',
+            'appointments.duration',
             'appointments.end',
             Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
             'appointments.personal_id',
@@ -42,6 +43,7 @@ class AppointmentController extends Controller
             PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
             'pets.name',
             'appointments.pet_id',
+            'appointments.status_button',
             'appointments.status',
         )
             ->join('pets', 'pets.id', '=', 'appointments.pet_id')
@@ -56,6 +58,7 @@ class AppointmentController extends Controller
                 'appointments.description',
                 'appointments.registration_date',
                 'appointments.hours',
+                'appointments.duration',
                 'appointments.end',
                 Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
                 'appointments.personal_id',
@@ -64,6 +67,7 @@ class AppointmentController extends Controller
                 PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
                 'pets.name',
                 'appointments.pet_id',
+                'appointments.status_button',
                 'appointments.status',
             )
                 ->join('pets', 'pets.id', '=', 'appointments.pet_id')
@@ -107,7 +111,8 @@ class AppointmentController extends Controller
         $cita = new Appointment([
             'registration_date' => $request->registration_date,
             'hours' => $request->hours,
-            'end' => $request->end,
+            'duration' => $request->end,
+            'end' => $request->fechaFin,
             'description' => $request->description,
             'personal_id' => $request->personal_id,
             'pet_id' => $request->pet_id,

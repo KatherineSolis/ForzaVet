@@ -3,147 +3,145 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <span>Nueva Visita</span>
+          <span>Resultados</span>
+
         </div>
-        <div style="padding:25px 50px 0px 20px;">
+        <div style="margin-bottom: 50px">
+          <div class="filter-container">
+            <el-input
+              v-model="listQuery.reason"
+              placeholder="Tipo"
+              style="width: 200px"
+              class="filter-item"
+              @keyup.enter.native="handleFilter"
+            />
 
-          <el-form ref="form" :rules="rules" :model="form" label-width="120px">
-            <el-form-item label="Fecha">
-              <el-date-picker v-model="form.date" type="datetime" placeholder="ingrese fecha" />
-            </el-form-item>
-            <el-form-item label="Veterinario" prop="personal_id">
-              <el-select v-model="form.personal_id" placeholder="Seleccione Veterinario..." style="width: 100%;">
-                <el-option
-                  v-for="item in optionsPersonal"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Propietario" prop="client_id">
-              <el-select v-model="form.client_id" placeholder="Seleccione Cliente..." style="width: 100%;" @input="getListPet">
-                <el-option
-                  v-for="item in optionsClient"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Paciente" prop="pet_id">
-              <el-select v-model="form.pet_id" placeholder="Seleccione mascota..." style="width: 100%;">
-                <el-option
-                  v-for="item in optionsPet"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="Motivo de visita" prop="reason">
-              <el-input v-model="form.reason" type="textarea" style="width: 100%;" />
-            </el-form-item>
+            <el-button
+              v-waves
+              class="filter-item"
+              type="primary"
+              icon="el-icon-search"
+              @click="handleFilter"
+            >
+              {{ $t('table.search') }}
+            </el-button>
+          </div>
+        </div>
 
-            <el-form-item label="Anamnesis" prop="anamnesis">
-              <el-input v-model="form.anamnesis" type="textarea" style="width: 100%;" />
-            </el-form-item>
+        <div>
+          <el-table
+            :key="tableKey"
+            v-loading="listLoading"
+            :data="list"
+            border
+            fit
+            highlight-current-row
+            style="width: 100%"
+            @sort-change="sortChange"
+          >
 
-            <div>
-              <div style="border:1px solid #aeb6bf;width:100%;padding:30px;border-radius:8px;background:#eaf2f8;">
-                <template>
-                  <img src="images/vaccine.png" alt="Vacuna">  <h4 style="display:inline;">VACUNAS</h4>
+            <el-table-column
+              label="Fecha"
+              prop="date"
+              align="center"
+              min-width="180px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.date | parseTime('{y}-{m}-{d}') }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Propietario"
+              prop="client_id"
+              align="center"
+              width="200px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.nombre_cliente }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Paciente"
+              prop="name"
+              align="center"
+              width="180px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.name }} </span>
+                <!-- <span>{{ scope.row.first_name }} {{ scope.row.last_name }}</span> -->
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="Tipo"
+              prop="reason"
+              align="center"
+              min-width="180px"
+            >
+              <template slot-scope="scope">
+                <span>{{ scope.row.reason }}</span>
+              </template>
+            </el-table-column>
 
-                  <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="mostrarVacunas"><!---->
-                    <i class="el-icon-plus" />
-                    <span>Añadir</span>
-                  </button>
-                </template>
-              </div>
-              <div id="mostrar" style="border:1px solid #aeb6bf;width:100%;padding:30px 20px 50px 20px;border-radius: 0px 0px 8px 8px;display:none;">
-                <el-form-item label="Tipo de vacuna" prop="vaccine_id">
-                  <el-select v-model="form.vaccine_id" placeholder="Tipo Vacuna" style="width: 90%;">
-                    <el-option
-                      v-for="item in optionsVaccine"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="Detalles adicionales">
-                  <el-input v-model="form.vaccine_observation" type="textarea" style="width: 90%;" />
-                </el-form-item>
-                <button data-v-d3a7d412="" type="button" class="el-button el-button--danger el-button--medium borrar" style="float: right;margin-left:20px;" @click="ocultarVacunas"><!----><i class="el-icon-delete" />
-                  <span>Borrar</span>
-                </button>
-              </div>
-            </div>
-            <br>
-            <div>
-              <div style="border:1px solid #aeb6bf;width:100%;padding:30px;border-radius:8px;background:#eaf2f8;">
-                <template>
-                  <img src="images/medicamento.png" alt="Vacuna">  <h4 style="display:inline;"> ANTIPARASITARIOS</h4>
+            <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
+              <template slot-scope="{row}">
+                <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
+                <el-button v-if="row.status==1" icon="el-icon-delete" size="small" type="danger" @click="handleModifyStatus(row, 0)" />
+                <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success">
+                  Activar
+                </el-button>
+              </template>
+            </el-table-column>
 
-                  <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="mostrarDesparasitacion"><!---->
-                    <i class="el-icon-plus" />
-                    <span>Añadir</span>
-                  </button>
-                </template>
-              </div>
-              <div id="mostrar1" style="border:1px solid #aeb6bf;width:100%;padding:30px 20px 50px 20px;border-radius: 0px 0px 8px 8px;display:none;">
-                <el-form-item label="Tipo de antiparasitario" prop="antiparasitic_id">
-                  <el-select v-model="form.antiparasitic_id" placeholder="Desparacitante" style="width: 90%;">
-                    <el-option
-                      v-for="item in optionsAntiparasitic"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="Detalles adicionales">
-                  <el-input v-model="form.antiparasitic_observation" type="textarea" style="width: 90%;" />
-                </el-form-item>
-                <button data-v-d3a7d412="" type="button" class="el-button el-button--danger el-button--medium borrar" style="float: right;margin-left:20px;" @click="ocultarDesparasitacion"><!----><i class="el-icon-delete" />
-                  <span>Borrar</span>
-                </button>
-              </div>
-            </div>
-            <br>
-
-            <div>
+          </el-table>
+          <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" align="center" @pagination="getList" />
+          <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:100vh;">
+            <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
+              <el-form-item label="Fecha" style="width:100%;">
+                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" style="width:100%;" />
+              </el-form-item>
+              <el-form-item label="Nombre Cliente" prop="client_id">
+                <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." style="width:100%;" @input="getListClient">
+                  <el-option
+                    v-for="item in optionsClient"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Nombre Mascota" prop="pet_id">
+                <el-select v-model="temp.pet_id" placeholder="Seleccione cliente..." style="width:100%;" @input="getListPet">
+                  <el-option
+                    v-for="item in optionsPet"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Motivo de visita" prop="reason">
+                <el-select v-model="temp.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+                  <el-option
+                    v-for="(item, index) in options"
+                    :key="'c'+index"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </el-form-item>
               <el-form-item label="Diagnostivo" prop="diagnostic">
-                <el-input v-model="form.diagnostic" type="textarea" />
+                <el-input v-model="temp.diagnostic" type="textarea" />
               </el-form-item>
-              <el-form-item label="Patología" prop="pathology">
-                <el-input v-model="form.pathology" type="textarea" />
-              </el-form-item>
-              <el-form-item label="Tratamiento" prop="treatment">
-                <el-input v-model="form.treatment" type="textarea" />
-              </el-form-item>
-              <el-form-item label="Receta" prop="prescription">
-                <el-input v-model="form.prescription" type="textarea" />
-              </el-form-item>
-
-              <el-form-item label="">
-                <el-checkbox-group v-model="form.type">
-                  <el-checkbox label="¿Enviar receta al cliente por correo?" name="type" />
-                </el-checkbox-group>
-              </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">
+                {{ $t('table.cancel') }}
+              </el-button>
+              <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+                {{ $t('table.confirm') }}
+              </el-button>
             </div>
-
-            <br>
-
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit">
-                Create
-              </el-button>
-              <el-button @click="onCancel">
-                Cancel
-              </el-button>
-            </el-form-item>
-          </el-form>
+          </el-dialog>
         </div>
       </el-card>
     </el-row>
@@ -151,27 +149,65 @@
 </template>
 
 <script>
-import { ListPersonal, ListClient, ListPet, ListVaccine, ListAntiparasitic, getAppointment } from '@/api/appointment';
-import { fetchList, createHistory } from '@/api/clinic_history';
+import { ListClient, fetchListPet } from '@/api/appointment';
+import { updateHistory, consultaList } from '@/api/clinic_history';
+import waves from '@/directive/waves'; // Waves directive
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 export default {
+  components: { Pagination },
+  directives: { waves },
   data() {
     return {
-      listLoading: false,
+      tableKey: 0,
       total: 0,
-      list: null,
-      rules: {
-        date: [{ required: true, message: 'type is required', trigger: 'change' }],
-        personal_id: [{ required: true, message: 'type is required', trigger: 'change' }],
-        client_id: [{ required: true, message: 'type is required', trigger: 'change' }],
-        pet_id: [{ required: true, message: 'type is required', trigger: 'change' }],
-        reason: [{ required: true, message: 'type is required', trigger: 'change' }],
+      listQuery: {
+        page: 1,
+        limit: 20,
+        importance: undefined,
+        reason: undefined,
+        type: undefined,
+        sort: '+id',
       },
-      optionsPersonal: [],
+      listLoading: false,
+      list: null,
       optionsClient: [],
       optionsPet: [],
       optionsVaccine: [],
-      optionsAntiparasitic: [],
-      form: {
+      options: [
+        {
+          value: 'Baño',
+          label: 'Baño',
+        },
+        {
+          value: 'Corte',
+          label: 'Corte',
+        },
+        {
+          value: 'Limpieza dental',
+          label: 'Limpieza dental',
+        },
+        {
+          value: 'Baño Medicado',
+          label: 'Baño medicado',
+        },
+        {
+          value: 'Baño y corte',
+          label: 'Baño y corte',
+        },
+        {
+          value: 'Baño medicado y corte',
+          label: 'Baño medicado y corte',
+        }],
+      dialogFormVisible: false,
+      dialogStatus: '',
+      textMap: {
+        update: 'Edit',
+        create: 'Crear',
+      },
+      rules: {
+        name: [{ required: true, message: 'type is required', trigger: 'change' }],
+      },
+      temp: {
         id: undefined,
         date: '',
         personal_id: '',
@@ -187,49 +223,18 @@ export default {
         pathology: '',
         treatment: '',
         prescription: '',
-        type: true,
+
       },
     };
   },
-
   created() {
     this.getList();
     this.getListClient();
-    this.getListVaccine();
-    this.getListAntiparasitic();
-    this.getListPersonal();
+    this.getListPet();
   },
   methods: {
-    async getList() {
-      this.listLoading = true;
-      const { data } = await fetchList();
-      this.list = data.items;
-
-      // Just to simulate the time of the request
-      this.listLoading = false;
-      // console.log('visit', data.items);
-    },
     onSubmit() {
-      this.$refs['form'].validate((valid) => {
-        if (valid) {
-          const fechaHora = this.form.date.toLocaleString().split(' ');
-          const formatFecha = (fechaHora[0]).split('/');
-          this.form.id = this.list[this.list.length - 1].id + 1;
-          this.form.status = 1;
-          this.form.date = `${formatFecha[2]}-${formatFecha[1]}-${formatFecha[0]} ${fechaHora[1]}`;
-          createHistory(this.form).then((response) => {
-            this.list.push(this.form);
-            console.log(this.form);
-            this.$notify({
-              title: 'Success',
-              message: 'Created successfully',
-              type: 'success',
-              duration: 2000,
-            });
-          });
-        }
-      });
-      // this.$message('submit!');
+      this.$message('submit!');
     },
     onCancel() {
       this.$message({
@@ -237,68 +242,23 @@ export default {
         type: 'warning',
       });
     },
-    mostrarVacunas() {
-      const x = document.getElementById('mostrar');
-      if (x.style.display === 'none') {
-        x.style.display = 'block';
-      } else {
-        x.style.display = 'none';
+    handleFilter() {
+      this.listQuery.page = 1;
+      this.getList();
+    },
+    sortChange(data) {
+      const { prop, order } = data;
+      if (prop === 'id') {
+        this.sortByID(order);
       }
     },
-    mostrarDesparasitacion() {
-      const y = document.getElementById('mostrar1');
-      if (y.style.display === 'none') {
-        y.style.display = 'block';
-      } else {
-        y.style.display = 'none';
-      }
-    },
-    ocultarVacunas() {
-      const x = document.getElementById('mostrar');
-      if (x.style.display === 'block') {
-        x.style.display = 'none';
-      } else {
-        x.style.display = 'block';
-      }
-    },
-    ocultarDesparasitacion() {
-      const y = document.getElementById('mostrar1');
-      if (y.style.display === 'block') {
-        y.style.display = 'none';
-      } else {
-        y.style.display = 'block';
-      }
-    },
-    resetTemp() {
-      this.form = {
-        id: undefined,
-        date: '',
-        personal_id: '',
-        client_id: '',
-        pet_id: '',
-        reason: '',
-        anamnesis: '',
-        vaccine_id: '',
-        vaccine_observation: '',
-        antiparasitic_id: '',
-        antiparasitic_observation: '',
-        diagnostic: '',
-        pathology: '',
-        treatment: '',
-        prescription: '',
-
-      };
-    },
-    async getListPersonal() {
+    async getList() {
       this.listLoading = true;
-      const { data } = await ListPersonal();
-
-      for (var i in data.items) {
-        this.optionsPersonal.push({ value: data.items[i].id, label: data.items[i].first_name + ' ' + data.items[i].last_name });
-      }
+      const { data } = await consultaList(this.listQuery);
+      this.list = data.items;
+      this.total = data.total;
       // Just to simulate the time of the request
       this.listLoading = false;
-      // console.log('medicos', this.optionsPersonal);
     },
     async getListClient() {
       this.listLoading = true;
@@ -309,48 +269,61 @@ export default {
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      // console.log('cliente', this.optionsClient);
     },
     async getListPet() {
       this.listLoading = true;
-      const { data } = await ListPet(this.form);
+      const { data } = await fetchListPet();
       this.optionsPet = [];
       for (var i in data.items) {
         this.optionsPet.push({ value: data.items[i].id, label: data.items[i].name });
       }
       // Just to simulate the time of the request
       this.listLoading = false;
-      // console.log('pet', this.optionsPet);
     },
-    async getListVaccine() {
+    updateData() {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          console.log(this.temp);
+          updateHistory(this.temp).then(() => {
+            for (const v of this.list) {
+              if (v.id === this.temp.id) {
+                const index = this.list.indexOf(v);
+                this.list.splice(index, 1, this.temp);
+                break;
+              }
+            }
+            this.dialogFormVisible = false;
+            this.$notify({
+              title: 'Success',
+              message: 'Updated successfully',
+              type: 'success',
+              duration: 2000,
+            });
+          });
+        }
+      });
+    },
+    handleUpdate(row) {
+      this.temp = Object.assign({}, row); // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp);
+      this.dialogStatus = 'update';
+      this.dialogFormVisible = true;
+    },
+    async handleModifyStatus(row, status) {
       this.listLoading = true;
-      const { data } = await ListVaccine();
+      row.status = status;
+      await updateHistory(row);
 
-      for (var i in data.items) {
-        this.optionsVaccine.push({ value: data.items[i].id, label: data.items[i].name_vaccines });
-      }
-      // Just to simulate the time of the request
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
       this.listLoading = false;
-      // console.log('vacunas', this.optionsVaccine);
-    },
-    async getListAntiparasitic() {
-      this.listLoading = true;
-      const { data } = await ListAntiparasitic();
-
-      for (var i in data.items) {
-        this.optionsAntiparasitic.push({ value: data.items[i].id, label: data.items[i].name_antiparasitic });
-      }
-      // Just to simulate the time of the request
-      this.listLoading = false;
-      // console.log('desparacitante', this.optionsAntiparasitic);
-    },
-    async getAppointment(id) {
-      const { data } = await getAppointment(id);
-      this.form = data.items[0];
     },
 
   },
 };
+
 </script>
 
 <style scoped>

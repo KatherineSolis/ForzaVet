@@ -6,10 +6,7 @@
           <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
             <i class="el-icon-back" />
           </router-link>
-          <span>Nueva estética</span>
-          <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="myFunction"><!----><i class="el-icon-check" /><span>
-            Guardar
-          </span></button>
+          <span>Vacunas</span>
         </div>
 
         <div style="padding:25px 50px 0px 20px;">
@@ -128,6 +125,8 @@ export default {
   },
   created() {
     const id = this.$route.params && this.$route.params.id;
+    console.log(this.$route.params);
+    console.log(this.$route);
     this.getList();
     this.getListClient();
     this.getListPet();
@@ -184,23 +183,6 @@ export default {
       // console.log('cliente', this.optionsVaccine);
     },
 
-    myFunction() {
-      var x = document.getElementById('mostrar');
-      if (x.style.display === 'none') {
-        x.style.display = 'block';
-      } else {
-        x.style.display = 'none';
-      }
-    },
-
-    myDelete() {
-      var x = document.getElementById('mostrar');
-      if (x.style.display === 'block') {
-        x.style.display = 'none';
-      } else {
-        x.style.display = 'block';
-      }
-    },
     onSubmit() {
       this.$refs['form'].validate((valid) => {
         if (valid) {
@@ -219,6 +201,7 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(-1);
         }
       });
     },

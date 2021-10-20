@@ -26,18 +26,11 @@ export default {
   directives: { waves },
   data() {
     var validateCita = (rule, value, callback) => {
-      let dateStringArray = this.temp.registration_date
-        .toLocaleDateString()
-        .split('/');
-      let fechaVal =
-        dateStringArray[2] +
-        '-' +
-        this.fechaMes(dateStringArray[1]) +
-        '-' +
-        this.fechaMes(dateStringArray[0]);
-      let timeString = this.temp.hours.toLocaleTimeString();
-      //let formatomes = this.fechaMes(dateStringArray[1]);
-      //console.log('formato mes', formatomes);
+      const dateStringArray = this.temp.registration_date.toLocaleDateString().split('/');
+      const fechaVal = dateStringArray[2] + '-' + this.fechaMes(dateStringArray[1]) + '-' + this.fechaMes(dateStringArray[0]);
+      const timeString = this.temp.hours.toLocaleTimeString();
+      // let formatomes = this.fechaMes(dateStringArray[1]);
+      // console.log('formato mes', formatomes);
       console.log('dateString', fechaVal);
       console.log('timeString', timeString);
 

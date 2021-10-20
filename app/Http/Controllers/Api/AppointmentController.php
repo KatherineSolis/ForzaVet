@@ -34,6 +34,7 @@ class AppointmentController extends Controller
             'appointments.description',
             'appointments.registration_date',
             'appointments.hours',
+            'appointments.end',
             Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
             'appointments.personal_id',
             PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
@@ -55,6 +56,7 @@ class AppointmentController extends Controller
                 'appointments.description',
                 'appointments.registration_date',
                 'appointments.hours',
+                'appointments.end',
                 Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
                 'appointments.personal_id',
                 PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
@@ -105,6 +107,7 @@ class AppointmentController extends Controller
         $cita = new Appointment([
             'registration_date' => $request->registration_date,
             'hours' => $request->hours,
+            'end' => $request->end,
             'description' => $request->description,
             'personal_id' => $request->personal_id,
             'pet_id' => $request->pet_id,
@@ -153,6 +156,7 @@ class AppointmentController extends Controller
             ->update([
                 'registration_date' => $request->registration_date,
                 'hours' => $request->hours,
+                'end' => $request->end,
                 'description' => $request->description,
                 'personal_id' => $request->personal_id,
                 'pet_id' => $request->pet_id,

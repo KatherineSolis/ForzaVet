@@ -3,7 +3,7 @@
     <el-form v-if="user">
       <el-row :gutter="20">
         <el-col :span="6">
-          <user-card :user="user" :temp="temp"/>
+          <user-card :user="user" :temp="temp" />
           <!-- <user-bio /> -->
         </el-col>
         <el-col :span="18">
@@ -23,7 +23,7 @@ import { getPet } from '@/api/pet';
 
 // const userResource = new Resource('pets');
 export default {
-  name: 'EditPet',
+  name: 'Historial',
   components: { UserCard, UserActivity },
   data() {
     return {
@@ -32,7 +32,7 @@ export default {
       vaccine: [],
       antiparasitic: [],
       peluqueria: [],
-      temp:[],
+      temp: {},
     };
   },
   watch: {

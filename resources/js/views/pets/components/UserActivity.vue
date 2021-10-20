@@ -1,7 +1,9 @@
 <template>
   <el-card v-if="user.nombre_cliente">
-   
-    <el-tabs v-model="activeActivity">
+    <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+      <i class="el-icon-back" />
+    </router-link>
+    <el-tabs v-model="activeActivity" @tab-click="handleClick">
       <el-tab-pane label="Datos del paciente" name="first">
         <div class="user-activity">
           <div class="dndList" style="padding:20px;">
@@ -350,7 +352,7 @@
           <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible1" style="min-width:100vh;">
             <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
               <el-form-item label="Fecha">
-                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" disabled style="width: 100%;"/>
+                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" disabled style="width: 100%;" />
               </el-form-item>
               <el-form-item label="Nombre Cliente" prop="client_id">
                 <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." style="width: 100%;" disabled @input="getListClient">
@@ -376,7 +378,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="Diagnostivo" prop="diagnostic">
-                <el-input v-model="temp.diagnostic" type="textarea" style="width: 100%;"/>
+                <el-input v-model="temp.diagnostic" type="textarea" style="width: 100%;" />
               </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -402,7 +404,6 @@ import waves from '@/directive/waves'; // Waves directive
 // const userResource = new Resource('users');
 
 export default {
-  inject: ['reload'],
   directives: { waves },
   props: {
     user: {
@@ -572,9 +573,12 @@ export default {
     this.getListAntiparasitic();
   },
   methods: {
-    /* handleClick(tab, event) {
-      console.log('Switching tab ', tab, event);
-    },*/
+    handleClick(tab, event) {
+      console.log('componente vue', tab, event);
+      console.log('tab seleccionado ', tab.name);
+      console.log('tab seleccionado ', tab.active);
+      console.log('tab seleccionado ', tab, event);
+    },
     sortChange(data) {
       const { prop, order } = data;
       if (prop === 'id') {

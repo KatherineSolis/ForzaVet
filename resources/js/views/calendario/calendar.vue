@@ -76,13 +76,13 @@
             <el-button @click="dialogFormVisible = false">
               {{ $t('table.cancel') }}
             </el-button>
-            <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
+            <el-button type="primary" :disabled="validacionCita" @click="dialogStatus==='create'?createData():updateData()">
               {{ $t('table.confirm') }}
             </el-button>
           </div>
         </el-dialog>
         <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible1" style="min-width:100vh;">
-          <el-form ref="dataForm" :rules="rules" :model="detail" style="padding:0px 30px;">
+          <el-form ref="dataForm1" :rules="rules" :model="detail" style="padding:0px 30px;">
             <el-form-item label="Fecha/Hora de cita" prop="registration_date">
               <el-col :span="11" style="width: 100%;">
                 <el-date-picker v-model="detail.registration_date" type="date" placeholder="Seleccione Fecha" style="width: 100%;" disabled/>
@@ -171,6 +171,7 @@ export default {
   directives: { waves },
   data() {
       var validateCita = (rule, value, callback) => {
+        //-------------------------------validaciones actuales
         const dateStringArray = this.temp.registration_date.toLocaleDateString().split('/');
         const inicioHora = new Date(this.temp.registration_date);
         const obtenerSegundos = inicioHora.getSeconds() + this.temp.end;
@@ -178,6 +179,8 @@ export default {
         const fechaVal = dateStringArray[2] + '-' + this.fechaMes(dateStringArray[1]) + '-' + this.fechaMes(dateStringArray[0]);
         const timeString = this.temp.hours.toLocaleTimeString();
         const objDate = new Date(fechaVal +' '+ timeString);
+        //----------------------------------------------------
+        //console.log(value);
         // let formatomes = this.fechaMes(dateStringArray[1]);
         // console.log('formato mes', formatomes);
         //console.log('dateString', fechaVal);
@@ -188,23 +191,19 @@ export default {
         if (value >= 1 && fechaVal != '' && timeString != '') {
           Object.entries(this.list).forEach(([key, valor]) => {
             const initSession = new Date(valor.registration_date +' '+ valor.hours);
-            const duracionCita = new Date(valor.registration_date +' '+ valor.hours);
-            const getSecondSession = initSession.getSeconds() + valor.duration;
-            initSession.setSeconds(getSecondSession);
+            const fechaFin = new Date (valor.end);
+            //console.log(valor.end);
             //console.log('----------------------------------------------------------------');
-            console.log(initSession);
-            console.log('segundos al comenzar la cita registrada en la base',duracionCita);
-            console.log('----------------------------------------------------------------');
+            //console.log(objDate.getTime() > initSession.getTime(), 'fecha a registrar ' + objDate.getTime(), ' fecha registrada ' + initSession.getTime());
+            //console.log(objDate.getTime() < valor.end.getTime(), ' fecha a registrar ' + objDate.getTime(), ' fecha registrada ' + valor.end.getTime());
+            //console.log('----------------------------------------------------------------');
             if (
               value == valor.personal_id &&
-              objDate.getSeconds() > duracionCita &&
-              objDate.getSeconds() < initSession.getSeconds()
-            ) {
-              console.log(
-                'No se puede registrar la cita',
-                valor.registration_date
-              );
-
+              (fechaVal == valor.registration_date &&
+              timeString == valor.hours)
+            )
+             {
+               console.log('No se puede registrar la cita Ya existe una cita con los mismos datos ');
               this.$notify({
                 title: 'No se puede registrar la cita',
                 message: 'Ya existe una cita con los mismos datos',
@@ -212,6 +211,17 @@ export default {
                 duration: 3000,
               });
               valida = true;
+            }else if (value == valor.personal_id && (objDate.getTime() > initSession.getTime() && objDate.getTime() < fechaFin.getTime())){
+              console.log('No se puede registrar la cita El horario no esta disponible ');
+              this.$notify({
+                title: 'No se puede registrar la cita',
+                message: 'El horario no esta disponible',
+                type: 'error',
+                duration: 3000,
+              });
+              valida = true;
+            }else{
+              callback();
             }
           });
         } else {
@@ -394,23 +404,32 @@ export default {
     };
   },
   created() {
-    //this.getList();
+    this.getList();
     this.getListPersonal();
     this.getListClient();
     this.getListPet();
     this.getListAllPet();
   },
   mounted() {
-    this.getList();
+    
   },
   methods: {
     handleDateClick: function(arg) {
       //console.log('desde el evento click',arg.date.toLocaleTimeString());
       //console.log(arg);
+      let today = new Date().getTime();
       if (arg.date.toLocaleTimeString() === "0:00:00"){
         this.$notify({
               title: 'No puede elegir la hora que esta seleccionando',
               message: 'Elegir un horario correspondiente de 09:00 a 19:00',
+              type: 'error',
+              duration: 8000,
+            });
+            this.presentarMensaje = true;
+      }else if(arg.date.getTime() < today){
+        this.$notify({
+              title: 'No puede elegir la fecha que esta seleccionando',
+              message: 'Elegir una fecha válida',
               type: 'error',
               duration: 8000,
             });
@@ -422,16 +441,8 @@ export default {
         this.temp.fechaEntera = arg.dateStr;
       }
     },
-    getEvents(){
-      console.log('en el evento');
-      //Object.entries(this.list).forEach(([key, value]) => {
-        //console.log(value);
-      this.calendarOptions.events = [{ title: this.list[0].description , start: this.list[0].fechaEntera, end: this.list[0].horafin }];
-      // this.calendarOptions.remove();
-      //});
-    },
     handleFilter() {
-      this.query.page = 1;
+      this.listQuery.page = 1;
       this.getList();
     },
     toggleWeekends: function() {
@@ -464,18 +475,22 @@ export default {
       /*if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
         clickInfo.event.remove();
       }*/
-      console.log(clickInfo.event.extendedProps);
-      console.log('falta poner la hora en que termina la cita');
       this.handleView(clickInfo.event.extendedProps);
     },
     /* handleEvents(events) {
       this.currentEvents = events;
     },*/ // metodo de listar agendamiento de citas
     async getList() {
+      const { limit, page } = this.listQuery;
       this.listLoading = true;
-      const { data } = await fetchList();
+      const { data } = await fetchList(this.listQuery);
       const calendarApi = this.$refs.fullCalendar.getApi();
+      const calendario = this.$refs.fullCalendar;
+      console.log(calendario);
       this.list = data.items;
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
       // Just to simulate the time of the request
       this.listLoading = false;
       Object.entries(this.list).forEach(([key, value]) => {
@@ -483,25 +498,20 @@ export default {
           //const hora = value.hours.split(':');
           //const fecha = value.registration_date.split('-');
           const fechafinn = value.end.split(' ');
-          this.list.fechaEntera = value.registration_date + 'T' + value.hours +'-05:00';
-          this.list.horafin = fechafinn[0]+'T'+fechafinn[1]+'-05:00';
-          //console.log(this.list.fechaEntera);
-          //console.log(this.list.horafin);
+          //this.list.fechaEntera = value.registration_date + 'T' + value.hours +'-05:00';
+          //this.list.horafin = fechafinn[0]+'T'+fechafinn[1]+'-05:00';
+          //console.log(value.fechaEntera);
+          //console.log(value.horafin);
           //console.log(value.personal_id);
           let background = this.colorCitas(value.personal_id);
           // ya estaban comentadas----------------------
-          // `${fecha[0]}-${fecha[1]}-${fecha[2]}T${hora[0]}:${hora[1]}:${hora[2]}-05:00`;
-          // new Date(fecha[0], fecha[1], fecha[2], hora[0], hora[1], hora[2]);
-          // termina aqui las lineas que ya estaban comentadas
-          /* const fechaAgenda = `${fecha[0]}-${fecha[1]}-${fecha[2]}T${hora[0]}:${hora[1]}:${hora[2]}-05:00`;
-          const fechaAgenda1 = `${fecha[0]}-${fecha[1]}-${fecha[2]}T${hora[0]}:30:${hora[2]}-05:00`;*/
           calendarApi.addEvent({
             id: value.id,
             backgroundColor: background,
             borderColor: background,
             title: value.description,
-            start: this.list.fechaEntera,
-            end: this.list.horafin,
+            start: value.fechaEntera,
+            end: value.horafin,
             allDay: false,
             extendedProps: {
               registration_date: value.registration_date,
@@ -606,13 +616,13 @@ export default {
       this.detail.fechaEntera = new Date(this.detail.registration_date+' '+this.detail.hours);
       this.detail.hours = this.detail.fechaEntera;
       this.detail.registration_date = this.detail.fechaEntera;
-      console.log(this.detail);
       this.dialogStatus = 'visualizar';
       this.dialogFormVisible1 = true;
     },
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
+          console.log('en la funcion createData');
           // esto añadí----------------
           const initSession = new Date(this.temp.registration_date);
           const getSecondSession = initSession.getSeconds() + this.temp.end;

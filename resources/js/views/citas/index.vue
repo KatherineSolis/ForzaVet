@@ -4,7 +4,7 @@
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>Listado de Citas</span>
-          <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/agenda/citas"><!----><i class="el-icon-plus" /><span>
+          <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/agenda/agendar/citas"><!----><i class="el-icon-plus" /><span>
             Nuevo
           </span></router-link>
         </div>
@@ -114,7 +114,10 @@
           <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
               <router-link :to="'/agenda/visit/new/'+row.id">
-                <el-button type="success" size="small">
+                <el-button v-if="row.status_button == 1" disabled type="success" size="small">
+                  <svg-icon icon-class="link" />
+                </el-button>
+                <el-button v-if="row.status_button == 0" type="success" size="small">
                   <svg-icon icon-class="link" />
                 </el-button>
               </router-link>
@@ -242,6 +245,7 @@ export default {
         nombre_veterinario: '',
         dateTime: '',
       },
+      status_button_cita: false,
     };
   },
   created() {
@@ -258,8 +262,13 @@ export default {
 
     async getList() {
       this.listLoading = true;
+      const { limit, page } = this.listQuery;
       const { data } = await fetchList(this.listQuery);
       this.list = data.items;
+      console.log(limit, page);
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
       this.total = data.total;
 
       // Just to simulate the time of the request

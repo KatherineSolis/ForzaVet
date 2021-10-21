@@ -239,7 +239,7 @@ export default {
         initialView: 'timeGridWeek',
         dateClick: this.handleDateClick,
         editable: true,
-        weekends: true, // initial value
+        weekends: false, // initial value
         // timeGridWeek: true, // initial value
         selectable: true,
         // initialEvents: INITIAL_EVENTS,

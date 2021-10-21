@@ -1,8 +1,11 @@
 <template>
   <el-card v-if="user.nombre_cliente">
-    <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+    <!--router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
       <i class="el-icon-back" />
-    </router-link>
+    </router-link-->
+    <el-button class="el-button el-button--primary el-button--small"  @click="regresar">
+          <i class="el-icon-back" />
+        </el-button>
     <el-tabs v-model="activeActivity" @tab-click="handleClick">
       <el-tab-pane label="Datos del paciente" name="first">
         <div class="user-activity">
@@ -788,6 +791,9 @@ export default {
         type: 'success',
       });
       this.listLoading = false;
+    },
+    regresar(){
+      this.$router.go(-1);
     },
   },
 };

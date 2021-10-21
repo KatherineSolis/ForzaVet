@@ -32,6 +32,14 @@ export function peluqueriaList(query) {
   });
 }
 
+export function consultaList(query) {
+  return request({
+    url: '/consultas',
+    method: 'get',
+    params: query,
+  });
+}
+
 export function peluqueriaCreate(data) {
   return request({
     url: '/peluqueria/create/' + data,

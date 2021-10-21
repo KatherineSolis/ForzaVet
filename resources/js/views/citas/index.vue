@@ -4,7 +4,7 @@
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>Listado de Citas</span>
-          <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/agenda/citas"><!----><i class="el-icon-plus" /><span>
+          <router-link data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" to="/agenda/agendar/citas"><!----><i class="el-icon-plus" /><span>
             Nuevo
           </span></router-link>
         </div>
@@ -113,12 +113,30 @@
 
           <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">
             <template slot-scope="{row}">
-              <router-link :to="'/agenda/visit/new/'+row.id">
+              <router-link v-if="row.description == 'Cirugia' || row.description == 'Consulta' || row.description == 'Examenes'" 
+              :to="'/agenda/visit/new/'+row.id">
                 <el-button type="success" size="small">
                   <svg-icon icon-class="link" />
                 </el-button>
               </router-link>
-
+              <router-link v-if="row.description == 'Peluqueria'" 
+              :to="'/servicio/peluqueria/create/'+row.pet_id">
+                <el-button type="success" size="small">
+                  <svg-icon icon-class="link" />
+                </el-button>
+              </router-link>
+              <router-link v-if="row.description == 'Desparasitacion'" 
+              :to="'/servicio/antiparasitic/create/'+row.pet_id">
+                <el-button type="success" size="small">
+                  <svg-icon icon-class="link" />
+                </el-button>
+              </router-link>
+              <router-link v-if="row.description == 'Vacunacion'" 
+              :to="'/servicio/vaccine/create/'+row.pet_id">
+                <el-button type="success" size="small">
+                  <svg-icon icon-class="link" />
+                </el-button>
+              </router-link>
               <el-button type="warning" icon="el-icon-view" size="small" @click="handleUpdate(row)" />
               <el-button v-if="row.status==1" icon="el-icon-turn-off" size="small" type="danger" @click="handleModifyStatus(row, 0)">
                 Inactivar
@@ -242,6 +260,7 @@ export default {
         nombre_veterinario: '',
         dateTime: '',
       },
+      status_button_cita: false,
     };
   },
   created() {
@@ -258,8 +277,13 @@ export default {
 
     async getList() {
       this.listLoading = true;
+      const { limit, page } = this.listQuery;
       const { data } = await fetchList(this.listQuery);
       this.list = data.items;
+      console.log(limit, page);
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
       this.total = data.total;
 
       // Just to simulate the time of the request

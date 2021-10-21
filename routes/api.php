@@ -110,6 +110,9 @@ Route::namespace('Api')->group(function () {
         //Peluqueria
         Route::get('/peluquerias', 'Clinic_historyController@peluqueriaList');
 
+        //Consultas
+        Route::get('/consultas', 'Clinic_historyController@consultaList');
+
         //Productos
         Route::get('/productos', 'ProductController@index');
         Route::post('/productos/create', 'ProductController@store');

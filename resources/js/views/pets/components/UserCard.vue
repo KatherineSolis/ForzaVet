@@ -35,9 +35,12 @@
       </div>
 
       <div class="user-follow">
-        <router-link class="el-button el-button--success el-button--small" to="/mascotas/list" style="width: 100%;font-size:14px;">
+        <el-button class="el-button el-button--success el-button--small"  @click="regresar" style="width: 100%;font-size:14px;">
           <i class="el-icon-back" /> Regresar
-        </router-link>
+        </el-button>
+        <!--router-link class="el-button el-button--success el-button--small" to="/mascotas/list" style="width: 100%;font-size:14px;">
+          <i class="el-icon-back" /> Regresar
+        </router-link-->
 
       </div>
     </div>
@@ -213,6 +216,9 @@ export default {
       this.temp.timestamp = new Date(this.temp.timestamp);
       this.dialogStatus = 'update';
       this.dialogFormVisible = true;
+    },
+    regresar(){
+      this.$router.go(-1);
     },
     updateData() {
       this.$refs['dataForm'].validate((valid) => {

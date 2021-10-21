@@ -225,6 +225,63 @@ class Clinic_historyController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function consultaList(Request $request)
+    {
+        //
+        $searchParams = $request->all();
+        $reason = Arr::get($searchParams, 'reason', '');
+
+        $consulta = Clinic_history::select(
+            'clinic_histories.id',
+            'clinic_histories.date',
+            'clinic_histories.reason',
+            'clinic_histories.client_id',
+            'clinic_histories.pet_id',
+            'clinic_histories.personal_id',
+            'clinic_histories.diagnostic',
+            'pets.name',
+            Clinic_history::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+            'clients.email as email_cliente',
+            'pets.weight',
+            'clinic_histories.status',
+        )
+            ->join('pets', 'pets.id', '=', 'clinic_histories.pet_id')
+            ->join('clients', 'clients.id', '=', 'clinic_histories.client_id')
+            ->where('clinic_histories.status', '=', '1')
+            ->whereIn("clinic_histories.reason", ['Consulta', 'Examen', 'Cirugia', 'Vacunacion', 'Desparasitacion'])
+            ->get()->toArray();
+
+        if (!empty($reason)) {
+            $consulta = Clinic_history::select(
+                'clinic_histories.id',
+                'clinic_histories.date',
+                'clinic_histories.reason',
+                'clinic_histories.client_id',
+                'clinic_histories.pet_id',
+                'clinic_histories.personal_id',
+                'clinic_histories.diagnostic',
+                'pets.name',
+                Clinic_history::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
+                'clients.email as email_cliente',
+                'pets.weight',
+                'clinic_histories.status',
+            )
+                ->join('pets', 'pets.id', '=', 'clinic_histories.pet_id')
+                ->join('clients', 'clients.id', '=', 'clinic_histories.client_id')
+                ->where('clinic_histories.status', '=', '1')
+                ->where('reason', 'LIKE', '%' . $request->reason . '%')
+               
+                ->whereIn("clinic_histories.reason", ['Consulta', 'Examen', 'Cirugia', 'Vacunacion', 'Desparasitacion'])
+                ->get()->toArray();
+        }
+        return response()->json(new JsonResponse(['items' => $consulta, 'total' => count($consulta)]));
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

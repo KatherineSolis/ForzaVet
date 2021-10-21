@@ -42,7 +42,15 @@
               </el-select>
             </el-form-item>
             <el-form-item label="Motivo de visita" prop="reason">
-              <el-input v-model="form.reason" type="textarea" style="width: 100%;" />
+             
+              <el-select v-model="form.reason" placeholder="Seleccione tipo..." style="width: 100%;">
+                <el-option
+                  v-for="(item, index) in options"
+                  :key="'c'+index"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
             </el-form-item>
 
             <el-form-item label="Anamnesis" prop="anamnesis">
@@ -151,7 +159,7 @@
 </template>
 
 <script>
-import { ListPersonal, ListClient, fetchListPet, ListVaccine, ListAntiparasitic, getAppointment } from '@/api/appointment';
+import { ListPersonal, ListClient, fetchListPet, ListVaccine, ListAntiparasitic, getAppointment, updateCita } from '@/api/appointment';
 import { fetchList, createHistory } from '@/api/clinic_history';
 export default {
   data() {
@@ -159,6 +167,7 @@ export default {
       listLoading: false,
       total: 0,
       list: null,
+      listCita: null,
       rules: {
         date: [{ required: true, message: 'type is required', trigger: 'change' }],
         personal_id: [{ required: true, message: 'type is required', trigger: 'change' }],
@@ -171,6 +180,28 @@ export default {
       optionsPet: [],
       optionsVaccine: [],
       optionsAntiparasitic: [],
+      options: [
+        {
+          value: 'Consulta',
+          label: 'Consulta',
+        },
+        {
+          value: 'Cirugia',
+          label: 'Cirugia',
+        },
+        {
+          value: 'Examen',
+          label: 'Examen',
+        },
+        {
+          value: 'Vacunación',
+          label: 'Vacunación',
+        },
+        
+        {
+          value: 'Desparasitación',
+          label: 'Desparasitación',
+        }],
       form: {
         id: undefined,
         date: '',
@@ -189,6 +220,7 @@ export default {
         prescription: '',
         type: true,
       },
+      consulta: {},
     };
   },
   watch: {
@@ -209,7 +241,6 @@ export default {
       this.listLoading = true;
       const { data } = await fetchList();
       this.list = data.items;
-
       // Just to simulate the time of the request
       this.listLoading = false;
       // console.log('visit', data.items);
@@ -230,6 +261,8 @@ export default {
               duration: 2000,
             });
           });
+          this.handleModifyStatus(this.consulta, '1');
+          this.$router.go(-1);
         }
       });
       // this.$message('submit!');
@@ -239,6 +272,7 @@ export default {
         message: 'cancel!',
         type: 'warning',
       });
+      this.$router.go(-1);
     },
     mostrarVacunas() {
       const x = document.getElementById('mostrar');
@@ -349,9 +383,25 @@ export default {
     },
     async getAppointment(id) {
       const { data } = await getAppointment(id);
-      this.form = data.items[0];
-      this.form.reason = this.form.description;
+      this.consulta = data.items[0];
+      this.form.reason = this.consulta.description;
+      this.form.dateTime = this.consulta.dateTime;
+      this.form.pet_id = this.consulta.pet_id;
+      this.form.personal_id = this.consulta.personal_id;
+      this.form.client_id = this.consulta.client_id;
+      console.log(this.consulta);
       // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
+    },
+    async handleModifyStatus(row, status) {
+      this.listLoading = true;
+      row.status_button = status;
+      await updateCita(row);
+
+      this.$message({
+        message: 'Successful operation',
+        type: 'success',
+      });
+      this.listLoading = false;
     },
 
   },

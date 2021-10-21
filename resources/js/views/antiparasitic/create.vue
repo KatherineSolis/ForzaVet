@@ -3,13 +3,10 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
+          <el-button class="el-button el-button--primary el-button--small" @click="onCancel">
             <i class="el-icon-back" />
-          </router-link>
+          </el-button>
           <span>Desparasitación</span>
-          <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="myFunction"><!----><i class="el-icon-check" /><span>
-            Guardar
-          </span></button>
         </div>
 
         <div style="padding:25px 50px 0px 20px;">
@@ -116,10 +113,7 @@ export default {
   },
   methods: {
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning',
-      });
+      this.$router.go(-1);
     },
     async getList() {
       this.listLoading = true;
@@ -199,6 +193,7 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(-1);
         }
       });
     },

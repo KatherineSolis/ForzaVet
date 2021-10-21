@@ -34,20 +34,25 @@ class AppointmentController extends Controller
             'appointments.description',
             'appointments.registration_date',
             'appointments.hours',
+            'appointments.duration',
             'appointments.end',
             Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
+            Appointment::raw("CONCAT(appointments.registration_date,'T',appointments.hours,'-05:00') AS fechaEntera"),
+            Appointment::raw("CONCAT(Date_format(appointments.end,'%Y-%m-%d'),'T', Date_format(appointments.end,'%H:%i:%s'), '-05:00') AS horafin"),
             'appointments.personal_id',
             PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
             'appointments.client_id',
             PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
             'pets.name',
             'appointments.pet_id',
+            'appointments.status_button',
             'appointments.status',
         )
             ->join('pets', 'pets.id', '=', 'appointments.pet_id')
             ->join('personals', 'personals.id', '=', 'appointments.personal_id')
             ->join('clients', 'clients.id', '=', 'appointments.client_id')
             ->where('appointments.status', '1')
+            ->where('appointments.status_button', '0')
             ->orderby('appointments.registration_date', 'desc')->get()->toArray();
 
         if (!empty($name)) {
@@ -56,20 +61,25 @@ class AppointmentController extends Controller
                 'appointments.description',
                 'appointments.registration_date',
                 'appointments.hours',
+                'appointments.duration',
                 'appointments.end',
                 Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),
+                Appointment::raw("CONCAT(appointments.registration_date,'T',appointments.hours,'-05:00') AS fechaEntera"),
+                Appointment::raw("CONCAT(Date_format(appointments.end,'%Y-%m-%d'),'T', Date_format(appointments.end,'%H:%i:%s'), '-05:00') AS horafin"),
                 'appointments.personal_id',
                 PET::raw("CONCAT(personals.first_name,' ',personals.last_name) AS nombre_veterinario"),
                 'appointments.client_id',
                 PET::raw("CONCAT(clients.first_name,' ',clients.last_name) AS nombre_cliente"),
                 'pets.name',
                 'appointments.pet_id',
+                'appointments.status_button',
                 'appointments.status',
             )
                 ->join('pets', 'pets.id', '=', 'appointments.pet_id')
                 ->join('personals', 'personals.id', '=', 'appointments.personal_id')
                 ->join('clients', 'clients.id', '=', 'appointments.client_id')
                 ->where('appointments.status', '1')
+                ->where('appointments.status_button', '0')
                 ->where('appointments.description', 'LIKE', '%' . $name . '%')
                 ->OrWhere('pets.name', 'LIKE', '%' . $name . '%')
                 ->orderby('appointments.registration_date', 'desc')->get()->toArray();
@@ -96,6 +106,8 @@ class AppointmentController extends Controller
     public function store(Request $request)
     {
         //
+        //dd($request); 
+        //exit;
         $cliente = Client::find($request->client_id);
         $details = [
             'fecha_cita' => $request->registration_date,
@@ -107,7 +119,8 @@ class AppointmentController extends Controller
         $cita = new Appointment([
             'registration_date' => $request->registration_date,
             'hours' => $request->hours,
-            'end' => $request->end,
+            'duration' => $request->end,
+            'end' => $request->fechaFin,
             'description' => $request->description,
             'personal_id' => $request->personal_id,
             'pet_id' => $request->pet_id,
@@ -162,6 +175,7 @@ class AppointmentController extends Controller
                 'pet_id' => $request->pet_id,
                 'client_id' => $request->client_id,
                 'status' => $request->status,
+                'status_button' => $request->status_button,
             ]);
     }
 
@@ -245,9 +259,15 @@ class AppointmentController extends Controller
         //
         if ($id >= 1) {
             $appointment = Appointment::select(
+                'appointments.id',
                 'appointments.pet_id',
+                'appointments.registration_date',
+                'appointments.hours',
+                'appointments.duration',
+                'appointments.end',
                 'appointments.personal_id',
                 'appointments.client_id',
+                'appointments.status_button',
                 'appointments.status',
                 'appointments.description',
                 Appointment::raw("CONCAT(appointments.registration_date,' ',appointments.hours) AS dateTime"),

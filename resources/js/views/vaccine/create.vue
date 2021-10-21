@@ -3,9 +3,9 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <router-link class="el-button el-button--primary el-button--small" to="/servicio/peluqueria">
+          <el-button class="el-button el-button--primary el-button--small" @click="onCancel">
             <i class="el-icon-back" />
-          </router-link>
+          </el-button>
           <span>Vacunas</span>
         </div>
 
@@ -139,6 +139,7 @@ export default {
         message: 'cancel!',
         type: 'warning',
       });
+      this.$router.go(-1);
     },
     async getList() {
       this.listLoading = true;

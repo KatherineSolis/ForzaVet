@@ -3,9 +3,9 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
-          <router-link class="el-button el-button--primary el-button--small" to="/mascotas/list">
+          <el-button class="el-button el-button--primary el-button--small" @click="onCancel">
             <i class="el-icon-back" />
-          </router-link>
+          </el-button>
           <span>Nueva peluquería</span>
 
         </div>
@@ -132,10 +132,7 @@ export default {
   },
   methods: {
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning',
-      });
+      this.$router.go(-1);
     },
     async getList() {
       this.listLoading = true;
@@ -214,6 +211,7 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(-1);
         }
       });
     },

@@ -36,6 +36,12 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('btejada_97'),
         ]);
 
+        $veterinario3 = User::create([
+            'name' => 'Justin Cedeño',
+            'email' => 'justincedeno43@gmail.com',
+            'password' => Hash::make('jcedeno_99'),
+        ]);
+
         $adminRole = Role::findByName(\App\Laravue\Acl::ROLE_ADMIN);
         $veterinarioRole = Role::findByName(\App\Laravue\Acl::ROLE_VETERINARY);
         $admin->syncRoles($adminRole);

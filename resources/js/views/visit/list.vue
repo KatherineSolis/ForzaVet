@@ -94,7 +94,7 @@
           <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" style="min-width:100vh;">
             <el-form ref="dataForm" :rules="rules" :model="temp" style="padding:0px 30px;">
               <el-form-item label="Fecha" style="width:100%;">
-                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" style="width:100%;" />
+                <el-date-picker v-model="temp.date" type="datetime" placeholder="ingrese fecha" style="width:100%;" disabled/>
               </el-form-item>
               <el-form-item label="Nombre Cliente" prop="client_id">
                 <el-select v-model="temp.client_id" placeholder="Seleccione cliente..." style="width:100%;" @input="getListClient">
@@ -172,28 +172,25 @@ export default {
       optionsVaccine: [],
       options: [
         {
-          value: 'Baño',
-          label: 'Baño',
+          value: 'Consulta',
+          label: 'Consulta',
         },
         {
-          value: 'Corte',
-          label: 'Corte',
+          value: 'Cirugia',
+          label: 'Cirugia',
         },
         {
-          value: 'Limpieza dental',
-          label: 'Limpieza dental',
+          value: 'Examen',
+          label: 'Examen',
         },
         {
-          value: 'Baño Medicado',
-          label: 'Baño medicado',
+          value: 'Vacunación',
+          label: 'Vacunación',
         },
+        
         {
-          value: 'Baño y corte',
-          label: 'Baño y corte',
-        },
-        {
-          value: 'Baño medicado y corte',
-          label: 'Baño medicado y corte',
+          value: 'Desparasitación',
+          label: 'Desparasitación',
         }],
       dialogFormVisible: false,
       dialogStatus: '',

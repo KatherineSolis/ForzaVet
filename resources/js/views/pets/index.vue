@@ -418,8 +418,12 @@ export default {
 
     async getList() {
       this.listLoading = true;
+      const { limit, page } = this.listQuery;
       const { data } = await fetchList(this.listQuery);
       this.list = data.items;
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
       this.total = data.total;
 
       // Just to simulate the time of the request
@@ -481,6 +485,7 @@ export default {
           }
           createPet(this.temp).then((response) => {
             this.list.push(this.temp);
+            this.handleFilter();
             this.dialogFormVisible = false;
 
             this.$notify({
@@ -489,7 +494,7 @@ export default {
               type: 'success',
               duration: 2000,
             });
-            this.$router.go(0);
+            //this.$router.go(0);
           });
         }
       });
@@ -505,6 +510,7 @@ export default {
                 break;
               }
             }
+            this.handleFilter();
             this.dialogFormVisible = false;
             this.$notify({
               title: 'Success',
@@ -521,7 +527,7 @@ export default {
       this.listLoading = true;
       row.status = status;
       await updatePet(row);
-
+      this.handleFilter();
       this.$message({
         message: 'Successful operation',
         type: 'success',

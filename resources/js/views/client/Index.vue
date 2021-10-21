@@ -320,9 +320,9 @@ export default {
           { max: 13, message: 'Este campo acepta máximo 13 digitos', trigger: ['blur', 'change'] },
           { validator: validateDocumentType, trigger: 'blur' }],
         first_name: [{ required: true, message: 'Campo requerido', trigger: 'change' },
-          { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur' }],
+          /*{ pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur' }*/],
         last_name: [{ required: true, message: 'Campo requerido', trigger: 'change' },
-          { pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur' }],
+          /*{ pattern: /^[A-Z]+$/i, message: 'Solo se puede ingresar letras', trigger: 'blur' }*/],
         direction: [{ required: true, message: 'Campo requerido', trigger: 'change' }],
         email: [
           { required: true, message: 'Campo requerido', trigger: 'blur' },

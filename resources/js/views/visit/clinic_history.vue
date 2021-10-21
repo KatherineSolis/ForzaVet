@@ -3,6 +3,9 @@
     <el-row>
       <el-card class="box-card">
         <div slot="header" class="clearfix">
+          <el-button class="el-button el-button--primary el-button--small" @click="onCancel">
+            <i class="el-icon-back" />
+          </el-button>
           <span>Nueva Visita</span>
         </div>
         <div style="padding:25px 50px 0px 20px;">
@@ -48,69 +51,6 @@
             <el-form-item label="Anamnesis" prop="anamnesis">
               <el-input v-model="form.anamnesis" type="textarea" style="width: 100%;" />
             </el-form-item>
-
-            <div>
-              <div style="border:1px solid #aeb6bf;width:100%;padding:30px;border-radius:8px;background:#eaf2f8;">
-                <template>
-                  <img src="images/vaccine.png" alt="Vacuna">  <h4 style="display:inline;">VACUNAS</h4>
-
-                  <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="mostrarVacunas"><!---->
-                    <i class="el-icon-plus" />
-                    <span>Añadir</span>
-                  </button>
-                </template>
-              </div>
-              <div id="mostrar" style="border:1px solid #aeb6bf;width:100%;padding:30px 20px 50px 20px;border-radius: 0px 0px 8px 8px;display:none;">
-                <el-form-item label="Tipo de vacuna" prop="vaccine_id">
-                  <el-select v-model="form.vaccine_id" placeholder="Tipo Vacuna" style="width: 90%;">
-                    <el-option
-                      v-for="item in optionsVaccine"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="Detalles adicionales">
-                  <el-input v-model="form.vaccine_observation" type="textarea" style="width: 90%;" />
-                </el-form-item>
-                <button data-v-d3a7d412="" type="button" class="el-button el-button--danger el-button--medium borrar" style="float: right;margin-left:20px;" @click="ocultarVacunas"><!----><i class="el-icon-delete" />
-                  <span>Borrar</span>
-                </button>
-              </div>
-            </div>
-            <br>
-            <div>
-              <div style="border:1px solid #aeb6bf;width:100%;padding:30px;border-radius:8px;background:#eaf2f8;">
-                <template>
-                  <img src="images/medicamento.png" alt="Vacuna">  <h4 style="display:inline;"> ANTIPARASITARIOS</h4>
-
-                  <button data-v-d3a7d412="" type="button" class="el-button el-button--primary el-button--medium" style="float: right;margin-botton:15px;" @click="mostrarDesparasitacion"><!---->
-                    <i class="el-icon-plus" />
-                    <span>Añadir</span>
-                  </button>
-                </template>
-              </div>
-              <div id="mostrar1" style="border:1px solid #aeb6bf;width:100%;padding:30px 20px 50px 20px;border-radius: 0px 0px 8px 8px;display:none;">
-                <el-form-item label="Tipo de antiparasitario" prop="antiparasitic_id">
-                  <el-select v-model="form.antiparasitic_id" placeholder="Desparacitante" style="width: 90%;">
-                    <el-option
-                      v-for="item in optionsAntiparasitic"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="Detalles adicionales">
-                  <el-input v-model="form.antiparasitic_observation" type="textarea" style="width: 90%;" />
-                </el-form-item>
-                <button data-v-d3a7d412="" type="button" class="el-button el-button--danger el-button--medium borrar" style="float: right;margin-left:20px;" @click="ocultarDesparasitacion"><!----><i class="el-icon-delete" />
-                  <span>Borrar</span>
-                </button>
-              </div>
-            </div>
-            <br>
 
             <div>
               <el-form-item label="Diagnostivo" prop="diagnostic">
@@ -232,48 +172,15 @@ export default {
               duration: 2000,
             });
           });
+          this.$router.go(-1);
         }
       });
       // this.$message('submit!');
     },
     onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning',
-      });
+      this.$router.go(-1);
     },
-    mostrarVacunas() {
-      const x = document.getElementById('mostrar');
-      if (x.style.display === 'none') {
-        x.style.display = 'block';
-      } else {
-        x.style.display = 'none';
-      }
-    },
-    mostrarDesparasitacion() {
-      const y = document.getElementById('mostrar1');
-      if (y.style.display === 'none') {
-        y.style.display = 'block';
-      } else {
-        y.style.display = 'none';
-      }
-    },
-    ocultarVacunas() {
-      const x = document.getElementById('mostrar');
-      if (x.style.display === 'block') {
-        x.style.display = 'none';
-      } else {
-        x.style.display = 'block';
-      }
-    },
-    ocultarDesparasitacion() {
-      const y = document.getElementById('mostrar1');
-      if (y.style.display === 'block') {
-        y.style.display = 'none';
-      } else {
-        y.style.display = 'block';
-      }
-    },
+
     resetTemp() {
       this.form = {
         id: undefined,

@@ -314,16 +314,18 @@
             @sort-change="sortChange"
           >
 
-            <el-table-column
-              label="Paciente"
-              prop="diagnostic"
+          <el-table-column
+              label="Fecha"
+              prop="date"
               align="center"
-              width="180px"
+              width="150px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.diagnostic }}</span>
+                <span>{{ scope.row.date | parseTime('{y}-{m}-{d}') }}</span>
               </template>
             </el-table-column>
+           
+            
             <el-table-column
               label="Tipo"
               prop="reason"
@@ -334,14 +336,15 @@
                 <span>{{ scope.row.reason }}</span>
               </template>
             </el-table-column>
-            <el-table-column
-              label="Fecha"
-              prop="date"
+
+             <el-table-column
+              label="Detalle"
+              prop="diagnostic"
               align="center"
-              width="150px"
+              width="180px"
             >
               <template slot-scope="scope">
-                <span>{{ scope.row.date | parseTime('{y}-{m}-{d}') }}</span>
+                <span>{{ scope.row.diagnostic }}</span>
               </template>
             </el-table-column>
             <el-table-column label="Acciones" align="center" width="250" class-name="small-padding fixed-width">

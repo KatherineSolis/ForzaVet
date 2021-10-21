@@ -46,13 +46,13 @@
           @sort-change="sortChange"
         >
 
-          <el-table-column align="center" label="Nombre" prop="name_antiparasitic" width="150">
+          <el-table-column align="center" label="Nombre" prop="name_antiparasitic" min-width="300">
             <template slot-scope="scope">
               <span>{{ scope.row.name_antiparasitic }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="Estado" class-name="status-col" width="100">
+          <el-table-column label="Estado" class-name="status-col" min-width="200">
             <template slot-scope="{row}">
               <div v-if="row.status == 1">
                 <el-tag type="success" class="tag-item el-tag el-tag--medium el-tag--light">

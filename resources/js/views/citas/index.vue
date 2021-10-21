@@ -120,19 +120,19 @@
                 </el-button>
               </router-link>
               <router-link v-if="row.description == 'Peluqueria'" 
-              :to="'/servicio/peluqueria/create/'+row.pet_id">
+              :to="'/servicio/peluqueria/create-cita/'+row.id">
                 <el-button type="success" size="small">
                   <svg-icon icon-class="link" />
                 </el-button>
               </router-link>
               <router-link v-if="row.description == 'Desparasitacion'" 
-              :to="'/servicio/antiparasitic/create/'+row.pet_id">
+              :to="'/servicio/antiparasitic/create-cita/'+row.id">
                 <el-button type="success" size="small">
                   <svg-icon icon-class="link" />
                 </el-button>
               </router-link>
               <router-link v-if="row.description == 'Vacunacion'" 
-              :to="'/servicio/vaccine/create/'+row.pet_id">
+              :to="'/servicio/vaccine/create-cita/'+row.id">
                 <el-button type="success" size="small">
                   <svg-icon icon-class="link" />
                 </el-button>

@@ -204,6 +204,14 @@ export const asyncRoutes = [{
                 hidden: true,
             },
             {
+                path: 'peluqueria/create-cita/:id(\\d+)',
+                name: 'peluqueria111',
+                component: () =>
+                    import ('@/views/peluqueria/create-cita'),
+                meta: { title: 'Peluqueria' },
+                hidden: true,
+            },
+            {
                 path: 'vaccine/create/:id(\\d+)',
                 component: () =>
                     import ('@/views/vaccine/create'),
@@ -211,9 +219,23 @@ export const asyncRoutes = [{
                 hidden: true,
             },
             {
+                path: 'vaccine/create-cita/:id(\\d+)',
+                component: () =>
+                    import ('@/views/vaccine/create-cita'),
+                meta: { title: 'Vacunación' },
+                hidden: true,
+            },
+            {
                 path: 'antiparasitic/create/:id(\\d+)',
                 component: () =>
                     import ('@/views/antiparasitic/create'),
+                meta: { title: 'Antiparasitario' },
+                hidden: true,
+            },
+            {
+                path: 'antiparasitic/create-cita/:id(\\d+)',
+                component: () =>
+                    import ('@/views/antiparasitic/create-cita'),
                 meta: { title: 'Antiparasitario' },
                 hidden: true,
             },

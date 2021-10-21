@@ -389,7 +389,6 @@ export default {
       this.form.pet_id = this.consulta.pet_id;
       this.form.personal_id = this.consulta.personal_id;
       this.form.client_id = this.consulta.client_id;
-      console.log(this.consulta);
       // console.log('usuario tipo: '+ typeof this.user, 'tipo historial: '+ typeof this.historial, 'tipo vaccine: '+ typeof this.vaccine, 'tipo antiparasitic: '+ typeof this.antiparasitic, typeof this.antiparasitic, typeof this.peluqueria);
     },
     async handleModifyStatus(row, status) {

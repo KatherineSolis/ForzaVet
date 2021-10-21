@@ -203,7 +203,7 @@ export default {
               timeString == valor.hours)
             )
              {
-               console.log('No se puede registrar la cita Ya existe una cita con los mismos datos ');
+               //console.log('No se puede registrar la cita Ya existe una cita con los mismos datos ');
               this.$notify({
                 title: 'No se puede registrar la cita',
                 message: 'Ya existe una cita con los mismos datos',
@@ -212,7 +212,7 @@ export default {
               });
               valida = true;
             }else if (value == valor.personal_id && (objDate.getTime() > initSession.getTime() && objDate.getTime() < fechaFin.getTime())){
-              console.log('No se puede registrar la cita El horario no esta disponible ');
+              //console.log('No se puede registrar la cita El horario no esta disponible ');
               this.$notify({
                 title: 'No se puede registrar la cita',
                 message: 'El horario no esta disponible',
@@ -225,7 +225,7 @@ export default {
             }
           });
         } else {
-          console.log('es valido');
+          //console.log('es valido');
         }
         if (valida) {
           this.validacionCita = true;
@@ -486,7 +486,6 @@ export default {
       const { data } = await fetchList(this.listQuery);
       const calendarApi = this.$refs.fullCalendar.getApi();
       const calendario = this.$refs.fullCalendar;
-      console.log(calendario);
       this.list = data.items;
       this.list.forEach((element, index) => {
         element['index'] = (page - 1) * limit + index + 1;
@@ -622,7 +621,6 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          console.log('en la funcion createData');
           // esto añadí----------------
           const initSession = new Date(this.temp.registration_date);
           const getSecondSession = initSession.getSeconds() + this.temp.end;

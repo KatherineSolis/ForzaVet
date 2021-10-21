@@ -85,10 +85,7 @@
             <el-table-column label="Acciones" align="center" width="230" class-name="small-padding fixed-width">
               <template slot-scope="{row}">
                 <el-button type="primary" icon="el-icon-edit-outline" size="small" @click="handleUpdate(row)" />
-                <el-button v-if="row.status==1" icon="el-icon-delete" size="small" type="danger" @click="handleModifyStatus(row, 0)" />
-                <el-button v-if="row.status==0" icon="el-icon-open" size="small" type="success">
-                  Activar
-                </el-button>
+                <el-button icon="el-icon-delete" size="small" type="danger" @click="handleModifyStatus(row, 0)" />
               </template>
             </el-table-column>
 
@@ -254,8 +251,12 @@ export default {
     },
     async getList() {
       this.listLoading = true;
+      const { limit, page } = this.listQuery;
       const { data } = await consultaList(this.listQuery);
       this.list = data.items;
+      this.list.forEach((element, index) => {
+        element['index'] = (page - 1) * limit + index + 1;
+      });
       this.total = data.total;
       // Just to simulate the time of the request
       this.listLoading = false;
@@ -292,6 +293,7 @@ export default {
                 break;
               }
             }
+            this.handleFilter();
             this.dialogFormVisible = false;
             this.$notify({
               title: 'Success',
@@ -313,7 +315,7 @@ export default {
       this.listLoading = true;
       row.status = status;
       await updateHistory(row);
-
+      this.handleFilter();
       this.$message({
         message: 'Successful operation',
         type: 'success',

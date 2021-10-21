@@ -352,6 +352,7 @@ export default {
               duration: 2000,
             });
           });
+          this.handleFilter();
         }
       });
     },
@@ -365,6 +366,7 @@ export default {
         type: 'success',
       });
       this.listLoading = false;
+      this.handleFilter();
     },
     handleUpdate(row) {
       this.temp = Object.assign({}, row); // copy obj

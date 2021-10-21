@@ -249,7 +249,7 @@ export const asyncRoutes = [{
             component: () =>
                 import ('@/views/vaccine/index'),
             name: 'vacunas',
-            meta: { title: 'Vacunas', icon: 'peoples', noCache: false, permissions: ['view menu vaccine'] },
+            meta: { title: 'Vacunas', icon: 'el-icon-edit-outline', noCache: false, permissions: ['view menu vaccine'] },
         }],
     },
     {
@@ -260,7 +260,7 @@ export const asyncRoutes = [{
             component: () =>
                 import ('@/views/antiparasitic/index'),
             name: 'antiparasitaric',
-            meta: { title: 'Antiparasitarios', icon: 'peoples', noCache: false, permissions: ['view menu antiparasitic'] },
+            meta: { title: 'Antiparasitarios', icon: 'el-icon-edit-outline', noCache: false, permissions: ['view menu antiparasitic'] },
         }],
     },
     adminRoutes,

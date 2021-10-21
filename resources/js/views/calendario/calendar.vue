@@ -640,14 +640,14 @@ export default {
           this.temp.registration_date = arrayFechaInicio[0];
           createCita(this.temp).then((response) => {
             this.dialogFormVisible = false;
-            //this.$router.go(0);
-            //this.getList();
+            this.$router.go(0);
+            this.getList();
             this.$message({
               message: 'Se agendo la cita' + this.temp.description + '(' + this.temp.registration_date + ' ' + this.temp.hours + ') correctamento.',
               type: 'success',
               duration: 5 * 1000,
             });
-            this.handleFilter();
+            //this.handleFilter();
           });
         }
       });
